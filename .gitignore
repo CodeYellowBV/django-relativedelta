@@ -1,0 +1,8 @@
+/django_relativedelta.egg-info
+/dist/
+__pycache__/
+venv
+*.egg
+/.eggs/
+*.pyc
+.tox/

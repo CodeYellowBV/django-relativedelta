@@ -4,7 +4,7 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
 from datetime import timedelta
-from dateutils import relativedelta
+from dateutil.relativedelta import relativedelta
 
 # This is not quite ISO8601, as it allows the SQL/Postgres extension
 # of allowing a minus sign in the values, and you can mix weeks with
@@ -68,7 +68,7 @@ def format_relativedelta(relativedelta):
 
 
 class RelativeDeltaField(models.Field):
-	"""Stores dateutil.relativedelta objects.
+	"""Stores dateutil.relativedelta.relativedelta objects.
 
 	Uses INTERVAL on PostgreSQL.
 	"""

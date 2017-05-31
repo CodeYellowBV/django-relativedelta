@@ -3,7 +3,7 @@ from django.test import TestCase
 from .testapp.models import Interval
 
 from datetime import timedelta
-from dateutils import relativedelta
+from dateutil.relativedelta import relativedelta
 
 class RelativeDeltaFieldTest(TestCase):
 	def setUp(self):

@@ -2,6 +2,7 @@ from django.test import TestCase
 
 from .testapp.models import Interval
 
+from datetime import timedelta
 from dateutils import relativedelta
 
 class RelativeDeltaFieldTest(TestCase):
@@ -34,6 +35,41 @@ class RelativeDeltaFieldTest(TestCase):
 		self.assertEqual(4.5, input_value.days)
 
 		# Check that the values are normalized
+		self.assertEqual(1, obj.value.years)
+		self.assertEqual(3, obj.value.months)
+		self.assertEqual(4, obj.value.days)
+		self.assertEqual(18, obj.value.hours)
+		self.assertEqual(11, obj.value.minutes)
+		self.assertEqual(50, obj.value.seconds)
+		self.assertEqual(100010, obj.value.microseconds)
+
+
+	def test_string_input(self):
+		obj = Interval(value='P1Y3M4.5DT5H70.5M80.10001S')
+		obj.full_clean()
+
+		self.assertIsInstance(obj.value, relativedelta)
+
+		# Check that the values are normalized
+		self.assertEqual(1, obj.value.years)
+		self.assertEqual(3, obj.value.months)
+		self.assertEqual(4, obj.value.days)
+		self.assertEqual(18, obj.value.hours)
+		self.assertEqual(11, obj.value.minutes)
+		self.assertEqual(50, obj.value.seconds)
+		self.assertEqual(100010, obj.value.microseconds)
+
+
+	def test_timedelta_input(self):
+		td = timedelta(days=4.5,hours=5,minutes=70.5,seconds=80.100005,microseconds=5)
+		obj = Interval(value=td)
+		obj.full_clean()
+
+		self.assertIsInstance(obj.value, relativedelta)
+
+		# Check that the values are normalized
+		self.assertEqual(0, obj.value.years)
+		self.assertEqual(0, obj.value.months)
 		self.assertEqual(4, obj.value.days)
 		self.assertEqual(18, obj.value.hours)
 		self.assertEqual(11, obj.value.minutes)

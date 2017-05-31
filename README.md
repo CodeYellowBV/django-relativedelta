@@ -53,6 +53,24 @@ my_model = MyModel(rdfield='P2M1DT6H')
 my_model.save()
 ```
 
+For convenience, a standard Python `datetime.timedelta` object is
+also accepted:
+
+```python
+from datetime import timedelta
+
+td = timedelta(days=62,hours=6)
+my_model = MyModel(rdfield=td)
+my_model.save()
+```
+
+After a `full_clean()`, the object will always be converted to a
+_normalized_ `relativedelta` instance.  It is highly recommended
+you use the [django-fullclean](https://github.com/fish-ball/django-fullclean)
+app to always force `full_clean()` on `save()`, so you can be
+sure that after a `save()`, your fields are both normalized
+and validated.
+
 
 ## Limitations and pitfalls
 

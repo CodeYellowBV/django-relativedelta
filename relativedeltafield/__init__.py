@@ -3,6 +3,7 @@ import re
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
+from datetime import timedelta
 from dateutils import relativedelta
 
 # This is not quite ISO8601, as it allows the SQL/Postgres extension
@@ -89,7 +90,7 @@ class RelativeDeltaField(models.Field):
 	def to_python(self, value):
 		if value is None or isinstance(value, relativedelta):
 			return value.normalized()
-		elif isinstance(value, datetime.timedelta):
+		elif isinstance(value, timedelta):
 			return (relativedelta() + value).normalized()
 
 		try:

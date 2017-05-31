@@ -86,7 +86,7 @@ representation.
 Databases other than PostgreSQL are not supported.
 
 For consistency reasons, when a relativedelta object is assigned to a
-RelativedeltaField, it automatically calls `normalized()` on
+RelativeDeltaField, it automatically calls `normalized()` on
 `full_clean`.  This ensures that the database representation is as
 similar to the relativedelta as possible (for instance, fractional
 days are always converted to hours).

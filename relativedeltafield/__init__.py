@@ -27,7 +27,7 @@ def parse_relativedelta(str):
 	m = iso8601_duration_re.match(str)
 	try:
 		args = {k: float(v) if v else 0 for k, v in m.groupdict().items()}
-		return relativedelta(**args) if m else None
+		return relativedelta(**args).normalized() if m else None
 	except ValueError:
 		return None
 
@@ -56,7 +56,7 @@ def format_relativedelta(relativedelta):
 	if relativedelta.seconds:
 		seconds = relativedelta.seconds
 		if relativedelta.microseconds:
-			seconds += relativedelta.microseconds / 1000.0
+			seconds += relativedelta.microseconds / 1000000.0
 		result_small += '{}S'.format(seconds)
 
 	if len(result_small) > 0:
@@ -88,9 +88,9 @@ class RelativeDeltaField(models.Field):
 
 	def to_python(self, value):
 		if value is None or isinstance(value, relativedelta):
-			return value
+			return value.normalized()
 		elif isinstance(value, datetime.timedelta):
-			return relativedelta() + value
+			return (relativedelta() + value).normalized()
 
 		try:
 			return parse_relativedelta(value)

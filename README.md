@@ -1,6 +1,6 @@
 # django-relativedelta
 
-A Django field for the [`dateutils.relativedelta`](https://labix.org/python-dateutil#head-ba5ffd4df8111d1b83fc194b97ebecf837add454) class,
+A Django field for the [`dateutil.relativedelta.relativedelta`](http://dateutil.readthedocs.io/en/stable/relativedelta.html) class,
 which conveniently maps to the [PostgresQL `INTERVAL` type](https://www.postgresql.org/docs/current/static/datatype-datetime.html#DATATYPE-INTERVAL-INPUT).
 
 The standard [Django `DurationField`](https://docs.djangoproject.com/en/1.10/ref/models/fields/#durationfield)
@@ -16,19 +16,59 @@ flexibility.
 
 If you want to use more advanced recurring dates, you should consider
 using [django-recurrence](https://github.com/django-recurrence/django-recurrence)
-instead.  This maps to the [`dateutils.rrule`](https://labix.org/python-dateutil#head-ba5ffd4df8111d1b83fc194b97ebecf837add454)
+instead.  This maps to the [`dateutil.rrule.rrule`](http://dateutil.readthedocs.io/en/stable/rrule.html)
 class, but it doesn't use native database field types, so you can't
 perform arithmetic on them within the database.
 
-## Limitations
+## Usage
+
+Using the field is straightforward.  You can add the field to your
+model like so:
+
+```python
+from django.db import models
+from relativedeltafield import RelativeDeltaField
+
+class MyModel(models.Model):
+	rdfield=RelativeDeltaField()
+```
+
+Then later, you can use it:
+
+```python
+from dateutil.relativedelta import relativedelta
+
+rd = relativedelta(months=2,days=1,hours=6)
+my_model = MyModel(rdfield=rd)
+my_model.save()
+```
+
+Or, alternatively, you can use a string with the
+[ISO8601 "format with designators" time interval syntax](https://www.postgresql.org/docs/current/static/datatype-datetime.html#DATATYPE-INTERVAL-INPUT):
+
+```python
+from dateutil.relativedelta import relativedelta
+
+my_model = MyModel(rdfield='P2M1DT6H')
+my_model.save()
+```
+
+
+## Limitations and pitfalls
 
 Because this field is backed by an `INTERVAL` column, it neither
-supports the relative `microseconds`, `weekday`, `leapdays`, `yearday`
-and `nlyearday` arguments, nor the absolute arguments `year`, `month`,
-`day`, `hour`, `second` and `microsecond`.
+supports the relative `weekday`, `leapdays`, `yearday` and `nlyearday`
+arguments, nor the absolute arguments `year`, `month`, `day`, `hour`,
+`second` and `microsecond`.
 
-It does support fractional specifications, so a floating-point
-`seconds` field allows for specifying microseconds with some loss of
-precision due to the floating-point representation.
+The `microseconds` field is converted to a fractional `seconds` value,
+which might lead to some precision loss due to floating-point
+representation.
 
 Databases other than PostgreSQL are not supported.
+
+For consistency reasons, when a relativedelta object is assigned to a
+RelativedeltaField, it automatically calls `normalized()` on
+`full_clean`.  This ensures that the database representation is as
+similar to the relativedelta as possible (for instance, fractional
+days are always converted to hours).

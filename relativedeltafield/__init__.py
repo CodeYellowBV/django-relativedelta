@@ -88,7 +88,9 @@ class RelativeDeltaField(models.Field):
 
 
 	def to_python(self, value):
-		if value is None or isinstance(value, relativedelta):
+		if value is None:
+			return value
+		elif isinstance(value, relativedelta):
 			return value.normalized()
 		elif isinstance(value, timedelta):
 			return (relativedelta() + value).normalized()

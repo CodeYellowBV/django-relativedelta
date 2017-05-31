@@ -1,5 +1,6 @@
 from django.test import TestCase
 
+from relativedeltafield import RelativeDeltaField
 from .testapp.models import Interval
 
 from datetime import timedelta
@@ -25,6 +26,20 @@ class RelativeDeltaFieldTest(TestCase):
 
 		obj.refresh_from_db()
 		self.assertIsNone(obj.value)
+
+
+	def test_none_value_survives_full_clean(self):
+		obj = Interval(value=None)
+		obj.full_clean()
+		self.assertIsNone(obj.value)
+
+
+	# Specific check, because to_python doesn't get called by save()
+	# or full_clean() when the value is None (but other things might)
+	# This is a regression test for a bug where we'd call normalized()
+	# even on None values.
+	def test_none_value_survives_to_python(self):
+		self.assertIsNone(RelativeDeltaField().to_python(None))
 
 
 	def test_value_is_normalized_on_full_clean(self):

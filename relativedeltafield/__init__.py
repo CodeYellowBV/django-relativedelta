@@ -107,7 +107,7 @@ class RelativeDeltaField(models.Field):
 		if value is None:
 			return value
 		else:
-			return format_relativedelta(value)
+			return format_relativedelta(self.to_python(value))
 
 
 	# This is a bit of a mindfuck.  We have to cast the output field

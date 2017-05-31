@@ -6,6 +6,10 @@ from datetime import timedelta
 from dateutils import relativedelta
 
 class RelativeDeltaFieldTest(TestCase):
+	def setUp(self):
+		Interval.objects.all().delete()
+
+
 	def test_basic_value_survives_db_roundtrip(self):
 		input_value = relativedelta(years=2,months=3,days=4,hours=5,minutes=52,seconds=30,microseconds=5)
 		obj = Interval(value=input_value)
@@ -75,3 +79,17 @@ class RelativeDeltaFieldTest(TestCase):
 		self.assertEqual(11, obj.value.minutes)
 		self.assertEqual(50, obj.value.seconds)
 		self.assertEqual(100010, obj.value.microseconds)
+
+
+	def test_filtering_works(self):
+		obj1 = Interval(value='P1Y3M4.5DT5H70.5M80.10001S')
+		obj1.save()
+
+		obj2 = Interval(value='P12D')
+		obj2.save()
+
+		q = Interval.objects.filter(value__gt='P1Y')
+		self.assertEqual(1, q.count())
+
+		q = Interval.objects.filter(value__lt='P2Y')
+		self.assertEqual(2, q.count())

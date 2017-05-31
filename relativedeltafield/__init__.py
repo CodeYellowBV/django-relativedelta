@@ -1,5 +1,6 @@
 import re
 
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
@@ -26,11 +27,11 @@ iso8601_duration_re = re.compile(
 # Parse ISO8601 timespec
 def parse_relativedelta(str):
 	m = iso8601_duration_re.match(str)
-	try:
+	if m:
 		args = {k: float(v) if v else 0 for k, v in m.groupdict().items()}
 		return relativedelta(**args).normalized() if m else None
-	except ValueError:
-		return None
+
+	raise ValueError('Not a valid (extended) ISO8601 interval specification')
 
 
 # Format ISO8601 timespec
@@ -97,8 +98,8 @@ class RelativeDeltaField(models.Field):
 
 		try:
 			return parse_relativedelta(value)
-		except ValueError:
-			raise exceptions.ValidationError(
+		except (ValueError, TypeError):
+			raise ValidationError(
 				self.error_messages['invalid'],
 				code='invalid',
 				params={'value': value},

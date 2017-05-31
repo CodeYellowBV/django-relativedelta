@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from django.test import TestCase
 
 from relativedeltafield import RelativeDeltaField
@@ -77,6 +78,40 @@ class RelativeDeltaFieldTest(TestCase):
 		self.assertEqual(11, obj.value.minutes)
 		self.assertEqual(50, obj.value.seconds)
 		self.assertEqual(100010, obj.value.microseconds)
+
+
+	def test_invalid_string_inputs_raise_validation_error(self):
+		obj = Interval()
+
+		obj.value = 'blabla'
+		with self.assertRaises(ValidationError) as cm:
+			obj.full_clean()
+		self.assertEqual(set(['value']), set(cm.exception.message_dict.keys()))
+
+		obj.value = 'P1.5M' # not allowed by relativedelta because it is supposedly ambiguous
+		with self.assertRaises(ValidationError) as cm:
+			obj.full_clean()
+		self.assertEqual(set(['value']), set(cm.exception.message_dict.keys()))
+
+		obj.value = 'P1M' # Check that the error is cleared when made valid again
+		obj.full_clean()
+
+
+	def test_invalid_objects_raise_validation_errors(self):
+		obj = Interval()
+
+		obj.value = True
+		with self.assertRaises(ValidationError) as cm:
+			obj.full_clean()
+		self.assertEqual(set(['value']), set(cm.exception.message_dict.keys()))
+
+		obj.value = 1
+		with self.assertRaises(ValidationError) as cm:
+			obj.full_clean()
+		self.assertEqual(set(['value']), set(cm.exception.message_dict.keys()))
+
+		obj.value = 'P1M' # Check that the error is cleared when made valid again
+		obj.full_clean()
 
 
 	def test_timedelta_input(self):

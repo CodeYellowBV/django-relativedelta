@@ -21,6 +21,34 @@ class RelativeDeltaFieldTest(TestCase):
 		self.assertEqual(input_value, obj.value)
 
 
+	def test_empty_value_survives_db_roundtrip(self):
+		obj = Interval(value=relativedelta())
+		obj.save()
+
+		obj.refresh_from_db()
+		self.assertEqual(relativedelta(), obj.value)
+
+
+	def test_each_separate_value_survives_db_roundtrip(self):
+		values = {
+			'years': 501,
+			'months': 10,
+			'days': 2.5,
+			'hours': 1.5,
+			'minutes': 52,
+			'seconds': 12,
+			'microseconds': 4,
+		}
+
+		for k in values:
+			input_value = relativedelta(*{k: values[k]})
+			obj = Interval(value=input_value)
+			obj.save()
+
+			obj.refresh_from_db()
+			self.assertEqual({k: input_value}, {k: obj.value})
+
+
 	def test_none_value_also_survives_db_roundtrip(self):
 		obj = Interval(value=None)
 		obj.save()

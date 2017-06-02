@@ -63,6 +63,8 @@ def format_relativedelta(relativedelta):
 
 	if len(result_small) > 0:
 		return 'P{}T{}'.format(result_big, result_small)
+	elif len(result_big) == 0:
+		return 'P0D' # Doesn't matter much what field is zero, but just 'P' is invalid syntax, and so is ''
 	else:
 		return 'P{}'.format(result_big)
 
@@ -127,7 +129,7 @@ class RelativeDeltaField(models.Field):
 	# that would mess with any existing Django DurationFields, since
 	# Django assumes PsycoPg2 returns pre-parsed datetime.timedeltas.
 	def select_format(self, compiler, sql, params):
-		fmt = 'to_char(%s, \'PYYYY"Y"MM"M"DD"DT"HH"H"MI"M"SS.US"S"\')' % sql
+		fmt = 'to_char(%s, \'PYYYY"Y"MM"M"DD"DT"HH24"H"MI"M"SS.US"S"\')' % sql
 		return fmt, params
 
 

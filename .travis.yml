@@ -1,0 +1,15 @@
+sudo: false
+language: python
+python:
+  - "3.4"
+  - "3.5"
+cache:
+  pip: true
+install:
+  - ./setup.py install
+script:
+  - ./setup.py test
+before_script:
+  - psql -c 'create database "relativedelta-test";' -U postgres
+services:
+  - postgresql

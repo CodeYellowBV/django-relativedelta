@@ -1,5 +1,7 @@
 # django-relativedelta
 
+[![Build Status](https://travis-ci.org/CodeYellowBV/django-relativedelta.svg?branch=master)](https://travis-ci.org/CodeYellowBV/django-relativedelta)
+
 A Django field for the [`dateutil.relativedelta.relativedelta`](http://dateutil.readthedocs.io/en/stable/relativedelta.html) class,
 which conveniently maps to the [PostgresQL `INTERVAL` type](https://www.postgresql.org/docs/current/static/datatype-datetime.html#DATATYPE-INTERVAL-INPUT).
 

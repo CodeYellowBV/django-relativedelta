@@ -11,6 +11,10 @@ class RelativeDeltaFieldTest(TestCase):
 	def setUp(self):
 		Interval.objects.all().delete()
 
+	def assertStrictEqual(self, a, b):
+		self.assertEqual(a, b)
+		self.assertEqual(type(a), type(b))
+
 
 	def test_basic_value_survives_db_roundtrip(self):
 		input_value = relativedelta(years=2,months=3,days=4,hours=5,minutes=52,seconds=30,microseconds=5)
@@ -18,7 +22,7 @@ class RelativeDeltaFieldTest(TestCase):
 		obj.save()
 
 		obj.refresh_from_db()
-		self.assertEqual(input_value, obj.value)
+		self.assertStrictEqual(input_value, obj.value)
 
 
 	def test_empty_value_survives_db_roundtrip(self):
@@ -26,27 +30,28 @@ class RelativeDeltaFieldTest(TestCase):
 		obj.save()
 
 		obj.refresh_from_db()
-		self.assertEqual(relativedelta(), obj.value)
+		self.assertStrictEqual(relativedelta(), obj.value)
 
 
 	def test_each_separate_value_survives_db_roundtrip(self):
 		values = {
 			'years': 501,
 			'months': 10,
-			'days': 2.5,
-			'hours': 1.5,
+			'days': 2,
+			'hours': 1,
 			'minutes': 52,
 			'seconds': 12,
-			'microseconds': 4,
 		}
 
 		for k in values:
-			input_value = relativedelta(*{k: values[k]})
+			input_value = relativedelta(**{k: values[k]})
 			obj = Interval(value=input_value)
 			obj.save()
 
 			obj.refresh_from_db()
+			# Put the object in a dict to get descriptive output on failure
 			self.assertEqual({k: input_value}, {k: obj.value})
+			self.assertEqual({k: int}, {k: type(getattr(obj.value, k))})
 
 
 	def test_none_value_also_survives_db_roundtrip(self):
@@ -77,19 +82,19 @@ class RelativeDeltaFieldTest(TestCase):
 		obj.full_clean()
 
 		self.assertNotEqual(input_value, obj.value)
-		self.assertEqual(input_value.normalized(), obj.value)
+		self.assertStrictEqual(input_value.normalized(), obj.value)
 
 		# Quick sanity check to ensure the input isn't mutated
-		self.assertEqual(4.5, input_value.days)
+		self.assertStrictEqual(4.5, input_value.days)
 
 		# Check that the values are normalized
-		self.assertEqual(1, obj.value.years)
-		self.assertEqual(3, obj.value.months)
-		self.assertEqual(4, obj.value.days)
-		self.assertEqual(18, obj.value.hours)
-		self.assertEqual(11, obj.value.minutes)
-		self.assertEqual(50, obj.value.seconds)
-		self.assertEqual(100010, obj.value.microseconds)
+		self.assertStrictEqual(1, obj.value.years)
+		self.assertStrictEqual(3, obj.value.months)
+		self.assertStrictEqual(4, obj.value.days)
+		self.assertStrictEqual(18, obj.value.hours)
+		self.assertStrictEqual(11, obj.value.minutes)
+		self.assertStrictEqual(50, obj.value.seconds)
+		self.assertStrictEqual(100010, obj.value.microseconds)
 
 
 	def test_string_input(self):
@@ -99,13 +104,13 @@ class RelativeDeltaFieldTest(TestCase):
 		self.assertIsInstance(obj.value, relativedelta)
 
 		# Check that the values are normalized
-		self.assertEqual(1, obj.value.years)
-		self.assertEqual(3, obj.value.months)
-		self.assertEqual(4, obj.value.days)
-		self.assertEqual(18, obj.value.hours)
-		self.assertEqual(11, obj.value.minutes)
-		self.assertEqual(50, obj.value.seconds)
-		self.assertEqual(100010, obj.value.microseconds)
+		self.assertStrictEqual(1, obj.value.years)
+		self.assertStrictEqual(3, obj.value.months)
+		self.assertStrictEqual(4, obj.value.days)
+		self.assertStrictEqual(18, obj.value.hours)
+		self.assertStrictEqual(11, obj.value.minutes)
+		self.assertStrictEqual(50, obj.value.seconds)
+		self.assertStrictEqual(100010, obj.value.microseconds)
 
 
 	def test_invalid_string_inputs_raise_validation_error(self):
@@ -150,13 +155,13 @@ class RelativeDeltaFieldTest(TestCase):
 		self.assertIsInstance(obj.value, relativedelta)
 
 		# Check that the values are normalized
-		self.assertEqual(0, obj.value.years)
-		self.assertEqual(0, obj.value.months)
-		self.assertEqual(4, obj.value.days)
-		self.assertEqual(18, obj.value.hours)
-		self.assertEqual(11, obj.value.minutes)
-		self.assertEqual(50, obj.value.seconds)
-		self.assertEqual(100010, obj.value.microseconds)
+		self.assertStrictEqual(0, obj.value.years)
+		self.assertStrictEqual(0, obj.value.months)
+		self.assertStrictEqual(4, obj.value.days)
+		self.assertStrictEqual(18, obj.value.hours)
+		self.assertStrictEqual(11, obj.value.minutes)
+		self.assertStrictEqual(50, obj.value.seconds)
+		self.assertStrictEqual(100010, obj.value.microseconds)
 
 
 	def test_filtering_works(self):

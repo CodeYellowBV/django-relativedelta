@@ -28,7 +28,14 @@ iso8601_duration_re = re.compile(
 def parse_relativedelta(str):
 	m = iso8601_duration_re.match(str)
 	if m:
-		args = {k: float(v) if v else 0 for k, v in m.groupdict().items()}
+		args = {}
+		for k, v in m.groupdict().items():
+			if v is  None:
+				args[k] = 0
+			elif '.' in v:
+				args[k] = float(v)
+			else:
+				args[k] = int(v)
 		return relativedelta(**args).normalized() if m else None
 
 	raise ValueError('Not a valid (extended) ISO8601 interval specification')

@@ -20,7 +20,7 @@ setup(
 	url='https://github.com/CodeYellowBV/django-relativedelta',
 	author='Peter Bex',
 	author_email='peter@codeyellow.nl',
-	test_suite='tests',
+	test_suite='relativedeltafield.tests',
 	classifiers=[
 		'Environment :: Web Environment',
 		'Framework :: Django',

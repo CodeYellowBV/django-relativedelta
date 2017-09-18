@@ -17,14 +17,14 @@ settings.configure(**{
 	],
 	'INSTALLED_APPS': [
 		'relativedeltafield',
-		'tests.testapp',
+		'relativedeltafield.tests.testapp',
 	],
 	'MIGRATION_MODULES': {
 		'testapp': None,
 		'relativedeltafield': None,
 	},
 	'USE_TZ': True,
-	#'ROOT_URLCONF': 'tests.testapp.urls',
+	#'ROOT_URLCONF': 'relativedeltafield.tests.testapp.urls',
 	'LOGGING': {
 		'version': 1,
 		'handlers': {

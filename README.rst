@@ -91,6 +91,13 @@ The ``microseconds`` field is converted to a fractional ``seconds``
 value, which might lead to some precision loss due to floating-point
 representation.
 
+The ``weeks`` field is "virtual", being derived from the multiple of 7
+days.  Thus, any week value in the input interval specification is
+converted to days and added to the ``days`` field of the interval.
+When serializing back to a string, weeks will never be written.
+Similarly, if the interval contains a multiple of 7 days, you can read
+this back out from the ``weeks`` property.
+
 Databases other than PostgreSQL are not supported.
 
 For consistency reasons, when a relativedelta object is assigned to a

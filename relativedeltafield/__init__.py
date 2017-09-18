@@ -50,8 +50,6 @@ def format_relativedelta(relativedelta):
 		result_big += '{}Y'.format(relativedelta.years)
 	if relativedelta.months:
 		result_big += '{}M'.format(relativedelta.months)
-	if relativedelta.weeks:
-		result_big += '{}W'.format(relativedelta.weeks)
 	if relativedelta.days:
 		result_big += '{}D'.format(relativedelta.days)
 

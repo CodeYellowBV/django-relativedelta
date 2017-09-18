@@ -54,6 +54,18 @@ class RelativeDeltaFieldTest(TestCase):
 			self.assertEqual({k: int}, {k: type(getattr(obj.value, k))})
 
 
+	# See issue #2, we should not serialize weeks separately, because
+	# it is a derived value.
+	def test_weeks_value_survives_db_roundtrip_as_days(self):
+		input_value = relativedelta(weeks=2,days=1)
+		obj = Interval(value=input_value)
+		obj.save()
+
+		obj.refresh_from_db()
+		self.assertStrictEqual(15, obj.value.days)
+		self.assertStrictEqual(2, obj.value.weeks)
+
+
 	def test_none_value_also_survives_db_roundtrip(self):
 		obj = Interval(value=None)
 		obj.save()
@@ -77,28 +89,33 @@ class RelativeDeltaFieldTest(TestCase):
 
 
 	def test_value_is_normalized_on_full_clean(self):
-		input_value = relativedelta(years=1,months=3,days=4.5,hours=5,minutes=70.5,seconds=80.100005,microseconds=5)
+		input_value = relativedelta(years=1,months=3,weeks=1,days=4.5,hours=5,minutes=70.5,seconds=80.100005,microseconds=5)
 		obj = Interval(value=input_value)
 		obj.full_clean()
 
 		self.assertNotEqual(input_value, obj.value)
 		self.assertStrictEqual(input_value.normalized(), obj.value)
 
-		# Quick sanity check to ensure the input isn't mutated
-		self.assertStrictEqual(4.5, input_value.days)
+		# Quick sanity check to ensure the input isn't mutated.
+		# Take into account that weeks are added to days though!
+		self.assertStrictEqual(11.5, input_value.days)
+		self.assertStrictEqual(1.0, input_value.weeks) # Because this is derived, it's a float :(
 
 		# Check that the values are normalized
 		self.assertStrictEqual(1, obj.value.years)
 		self.assertStrictEqual(3, obj.value.months)
-		self.assertStrictEqual(4, obj.value.days)
+		self.assertStrictEqual(11, obj.value.days)
 		self.assertStrictEqual(18, obj.value.hours)
 		self.assertStrictEqual(11, obj.value.minutes)
 		self.assertStrictEqual(50, obj.value.seconds)
 		self.assertStrictEqual(100010, obj.value.microseconds)
 
+		# Derived value, from the number of days (see #2)
+		self.assertStrictEqual(1, obj.value.weeks)
+
 
 	def test_string_input(self):
-		obj = Interval(value='P1Y3M4.5DT5H70.5M80.10001S')
+		obj = Interval(value='P1Y3M1W4.5DT5H70.5M80.10001S')
 		obj.full_clean()
 
 		self.assertIsInstance(obj.value, relativedelta)
@@ -106,11 +123,14 @@ class RelativeDeltaFieldTest(TestCase):
 		# Check that the values are normalized
 		self.assertStrictEqual(1, obj.value.years)
 		self.assertStrictEqual(3, obj.value.months)
-		self.assertStrictEqual(4, obj.value.days)
+		self.assertStrictEqual(11, obj.value.days)
 		self.assertStrictEqual(18, obj.value.hours)
 		self.assertStrictEqual(11, obj.value.minutes)
 		self.assertStrictEqual(50, obj.value.seconds)
 		self.assertStrictEqual(100010, obj.value.microseconds)
+
+		# Derived value, from the number of days (see #2)
+		self.assertStrictEqual(1, obj.value.weeks)
 
 
 	def test_invalid_string_inputs_raise_validation_error(self):
@@ -148,7 +168,7 @@ class RelativeDeltaFieldTest(TestCase):
 
 
 	def test_timedelta_input(self):
-		td = timedelta(days=4.5,hours=5,minutes=70.5,seconds=80.100005,microseconds=5)
+		td = timedelta(weeks=1,days=4.5,hours=5,minutes=70.5,seconds=80.100005,microseconds=5)
 		obj = Interval(value=td)
 		obj.full_clean()
 
@@ -157,15 +177,18 @@ class RelativeDeltaFieldTest(TestCase):
 		# Check that the values are normalized
 		self.assertStrictEqual(0, obj.value.years)
 		self.assertStrictEqual(0, obj.value.months)
-		self.assertStrictEqual(4, obj.value.days)
+		self.assertStrictEqual(11, obj.value.days)
 		self.assertStrictEqual(18, obj.value.hours)
 		self.assertStrictEqual(11, obj.value.minutes)
 		self.assertStrictEqual(50, obj.value.seconds)
 		self.assertStrictEqual(100010, obj.value.microseconds)
 
+		# Derived value, from the number of days (see #2)
+		self.assertStrictEqual(1, obj.value.weeks)
+
 
 	def test_filtering_works(self):
-		obj1 = Interval(value='P1Y3M4.5DT5H70.5M80.10001S')
+		obj1 = Interval(value='P1Y3M1W4.5DT5H70.5M80.10001S')
 		obj1.save()
 
 		obj2 = Interval(value='P12D')

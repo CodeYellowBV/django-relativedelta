@@ -1,5 +1,9 @@
 # Change log
 
+## v1.0.4
+
+* Also recognise Postgis contrib engine as a supported Postgres engine
+
 ## v1.0.3
 
 * Accidental upload; is identical to v1.0.2

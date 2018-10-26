@@ -7,6 +7,7 @@ from .testapp.models import Interval
 from datetime import timedelta
 from dateutil.relativedelta import relativedelta
 
+
 class RelativeDeltaFieldTest(TestCase):
 	def setUp(self):
 		Interval.objects.all().delete()
@@ -15,15 +16,13 @@ class RelativeDeltaFieldTest(TestCase):
 		self.assertEqual(a, b)
 		self.assertEqual(type(a), type(b))
 
-
 	def test_basic_value_survives_db_roundtrip(self):
-		input_value = relativedelta(years=2,months=3,days=4,hours=5,minutes=52,seconds=30,microseconds=5)
+		input_value = relativedelta(years=2, months=3, days=4, hours=5, minutes=52, seconds=30, microseconds=5)
 		obj = Interval(value=input_value)
 		obj.save()
 
 		obj.refresh_from_db()
 		self.assertStrictEqual(input_value, obj.value)
-
 
 	def test_empty_value_survives_db_roundtrip(self):
 		obj = Interval(value=relativedelta())
@@ -31,7 +30,6 @@ class RelativeDeltaFieldTest(TestCase):
 
 		obj.refresh_from_db()
 		self.assertStrictEqual(relativedelta(), obj.value)
-
 
 	def test_each_separate_value_survives_db_roundtrip(self):
 		values = {
@@ -53,18 +51,16 @@ class RelativeDeltaFieldTest(TestCase):
 			self.assertEqual({k: input_value}, {k: obj.value})
 			self.assertEqual({k: int}, {k: type(getattr(obj.value, k))})
 
-
 	# See issue #2, we should not serialize weeks separately, because
 	# it is a derived value.
 	def test_weeks_value_survives_db_roundtrip_as_days(self):
-		input_value = relativedelta(weeks=2,days=1)
+		input_value = relativedelta(weeks=2, days=1)
 		obj = Interval(value=input_value)
 		obj.save()
 
 		obj.refresh_from_db()
 		self.assertStrictEqual(15, obj.value.days)
 		self.assertStrictEqual(2, obj.value.weeks)
-
 
 	def test_none_value_also_survives_db_roundtrip(self):
 		obj = Interval(value=None)
@@ -73,12 +69,10 @@ class RelativeDeltaFieldTest(TestCase):
 		obj.refresh_from_db()
 		self.assertIsNone(obj.value)
 
-
 	def test_none_value_survives_full_clean(self):
 		obj = Interval(value=None)
 		obj.full_clean()
 		self.assertIsNone(obj.value)
-
 
 	# Specific check, because to_python doesn't get called by save()
 	# or full_clean() when the value is None (but other things might)
@@ -87,9 +81,9 @@ class RelativeDeltaFieldTest(TestCase):
 	def test_none_value_survives_to_python(self):
 		self.assertIsNone(RelativeDeltaField().to_python(None))
 
-
 	def test_value_is_normalized_on_full_clean(self):
-		input_value = relativedelta(years=1,months=3,weeks=1,days=4.5,hours=5,minutes=70.5,seconds=80.100005,microseconds=5)
+		input_value = relativedelta(years=1, months=3, weeks=1, days=4.5, hours=5, minutes=70.5, seconds=80.100005,
+									microseconds=5)
 		obj = Interval(value=input_value)
 		obj.full_clean()
 
@@ -99,7 +93,7 @@ class RelativeDeltaFieldTest(TestCase):
 		# Quick sanity check to ensure the input isn't mutated.
 		# Take into account that weeks are added to days though!
 		self.assertStrictEqual(11.5, input_value.days)
-		self.assertStrictEqual(1.0, input_value.weeks) # Because this is derived, it's a float :(
+		self.assertStrictEqual(1.0, input_value.weeks)  # Because this is derived, it's a float :(
 
 		# Check that the values are normalized
 		self.assertStrictEqual(1, obj.value.years)
@@ -112,7 +106,6 @@ class RelativeDeltaFieldTest(TestCase):
 
 		# Derived value, from the number of days (see #2)
 		self.assertStrictEqual(1, obj.value.weeks)
-
 
 	def test_string_input(self):
 		obj = Interval(value='P1Y3M1W4.5DT5H70.5M80.10001S')
@@ -132,7 +125,6 @@ class RelativeDeltaFieldTest(TestCase):
 		# Derived value, from the number of days (see #2)
 		self.assertStrictEqual(1, obj.value.weeks)
 
-
 	def test_invalid_string_inputs_raise_validation_error(self):
 		obj = Interval()
 
@@ -141,14 +133,13 @@ class RelativeDeltaFieldTest(TestCase):
 			obj.full_clean()
 		self.assertEqual(set(['value']), set(cm.exception.message_dict.keys()))
 
-		obj.value = 'P1.5M' # not allowed by relativedelta because it is supposedly ambiguous
+		obj.value = 'P1.5M'  # not allowed by relativedelta because it is supposedly ambiguous
 		with self.assertRaises(ValidationError) as cm:
 			obj.full_clean()
 		self.assertEqual(set(['value']), set(cm.exception.message_dict.keys()))
 
-		obj.value = 'P1M' # Check that the error is cleared when made valid again
+		obj.value = 'P1M'  # Check that the error is cleared when made valid again
 		obj.full_clean()
-
 
 	def test_invalid_objects_raise_validation_errors(self):
 		obj = Interval()
@@ -163,12 +154,11 @@ class RelativeDeltaFieldTest(TestCase):
 			obj.full_clean()
 		self.assertEqual(set(['value']), set(cm.exception.message_dict.keys()))
 
-		obj.value = 'P1M' # Check that the error is cleared when made valid again
+		obj.value = 'P1M'  # Check that the error is cleared when made valid again
 		obj.full_clean()
 
-
 	def test_timedelta_input(self):
-		td = timedelta(weeks=1,days=4.5,hours=5,minutes=70.5,seconds=80.100005,microseconds=5)
+		td = timedelta(weeks=1, days=4.5, hours=5, minutes=70.5, seconds=80.100005, microseconds=5)
 		obj = Interval(value=td)
 		obj.full_clean()
 
@@ -185,7 +175,6 @@ class RelativeDeltaFieldTest(TestCase):
 
 		# Derived value, from the number of days (see #2)
 		self.assertStrictEqual(1, obj.value.weeks)
-
 
 	def test_filtering_works(self):
 		obj1 = Interval(value='P1Y3M1W4.5DT5H70.5M80.10001S')

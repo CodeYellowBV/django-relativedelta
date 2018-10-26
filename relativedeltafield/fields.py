@@ -5,6 +5,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from datetime import timedelta
 
+from relativedeltafield import forms
 from relativedeltafield.utils import parse_relativedelta, format_relativedelta
 
 
@@ -78,3 +79,8 @@ class RelativeDeltaField(models.Field):
 	def value_to_string(self, obj):
 		val = self.value_from_object(obj)
 		return '' if val is None else format_relativedelta(val)
+
+	def formfield(self, **kwargs):
+		defaults = {'form_class': forms.RelativeDeltaField}
+		defaults.update(kwargs)
+		return super().formfield(**defaults)

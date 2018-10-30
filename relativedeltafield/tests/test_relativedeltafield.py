@@ -99,7 +99,7 @@ class RelativeDeltaFieldTest(TestCase):
 		# Quick sanity check to ensure the input isn't mutated.
 		# Take into account that weeks are added to days though!
 		self.assertStrictEqual(11.5, input_value.days)
-		self.assertStrictEqual(1.0, input_value.weeks) # Because this is derived, it's a float :(
+		self.assertStrictEqual(1, input_value.weeks)
 
 		# Check that the values are normalized
 		self.assertStrictEqual(1, obj.value.years)
@@ -110,8 +110,27 @@ class RelativeDeltaFieldTest(TestCase):
 		self.assertStrictEqual(50, obj.value.seconds)
 		self.assertStrictEqual(100010, obj.value.microseconds)
 
-		# Derived value, from the number of days (see #2)
+		# Derived value, from the number of days (see #2); but it's no
+		# longer converted to a floating-point number in newer
+		# versions of relativedelta....
 		self.assertStrictEqual(1, obj.value.weeks)
+
+
+	def test_weeks_value_is_derived_as_int_when_normalizing_on_full_clean(self):
+		input_value = relativedelta(years=1,months=3,weeks=1,days=11.5,hours=5,minutes=70.5,seconds=80.100005,microseconds=5)
+		obj = Interval(value=input_value)
+		obj.full_clean()
+
+		self.assertNotEqual(input_value, obj.value)
+		self.assertStrictEqual(input_value.normalized(), obj.value)
+
+		# Quick sanity check to ensure the input isn't mutated.
+		# Take into account that weeks are added to days though!
+		self.assertStrictEqual(18.5, input_value.days)
+		self.assertStrictEqual(2, input_value.weeks)
+
+		# Derived value, from the number of days (see #2)
+		self.assertStrictEqual(2, obj.value.weeks)
 
 
 	def test_string_input(self):

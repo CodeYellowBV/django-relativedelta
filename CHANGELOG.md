@@ -1,5 +1,10 @@
 # Change log
 
+## v1.0.5
+
+* Do not coerce "weeks" numbers to float.
+* Remove hard dependency on psycopg (#6)
+
 ## v1.0.4
 
 * Also recognise Postgis contrib engine as a supported Postgres engine

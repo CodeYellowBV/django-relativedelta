@@ -40,6 +40,12 @@ setup(
 	install_requires=[
 		'Django >= 1.10',
 		'python-dateutil >= 2.6.0',
-		'psycopg2 >= 2.7.0',
+                # Disabled (for now?) due to https://github.com/CodeYellowBV/django-relativedelta/issues/6
+                # We never import it directly from the code, so that is okay
+		#'psycopg2 >= 2.7.0',
 	],
+	tests_require=[
+                # The tests do need psycopg2
+		'psycopg2 >= 2.7.0',
+        ],
 )

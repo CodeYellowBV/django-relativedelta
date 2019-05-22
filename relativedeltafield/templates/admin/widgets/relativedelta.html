@@ -1,0 +1,6 @@
+<p>
+    {{ year_label }}: {% with widget=widget.subwidgets.0 %}{% include widget.template_name %}{% endwith %}
+    {{ month_label }}: {% with widget=widget.subwidgets.1 %}{% include widget.template_name %}{% endwith %}
+    {{ day_label }}: {% with widget=widget.subwidgets.2 %}{% include widget.template_name %}{% endwith %}<br>
+    {{ time_label }}: {% with widget=widget.subwidgets.3 %}{% include widget.template_name %}{% endwith %}
+</p>

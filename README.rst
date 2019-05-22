@@ -27,6 +27,16 @@ perform arithmetic on them within the database.
 Usage
 -----
 
+Setup:
+
+.. code:: python
+
+    INSTALLED_APPS = [
+        '...',
+        'relativedeltafield',
+        '...'
+    ]
+
 Using the field is straightforward.  You can add the field to your
 model like so:
 
@@ -77,6 +87,14 @@ you use the `django-fullclean <https://github.com/fish-ball/django-fullclean>`_
 app to always force ``full_clean()`` on ``save()``, so you can be
 sure that after a ``save()``, your fields are both normalized
 and validated.
+
+
+You can also use on admin:
+
+.. code:: python
+    from django.contrib import admin
+
+    admin.site.register(MyModel)
 
 
 Limitations and pitfalls

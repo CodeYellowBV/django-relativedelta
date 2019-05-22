@@ -2,9 +2,11 @@ import re
 
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.forms.widgets import MultiWidget, TimeInput, NumberInput
 from django.utils.translation import ugettext_lazy as _
+from django import forms
 
-from datetime import timedelta
+from datetime import timedelta, time
 from dateutil.relativedelta import relativedelta
 
 # This is not quite ISO8601, as it allows the SQL/Postgres extension
@@ -73,6 +75,61 @@ def format_relativedelta(relativedelta):
 	else:
 		return 'P{}'.format(result_big)
 
+
+
+class RelativeDetailInput(MultiWidget):
+	template_name = 'admin/widgets/relativedelta.html'
+
+	def __init__(self, attrs=None):
+		widgets = (
+			NumberInput(attrs=attrs),
+			NumberInput(attrs=attrs),
+			NumberInput(attrs=attrs),
+			TimeInput(attrs=attrs),
+		)
+		super().__init__(widgets)
+
+	def get_context(self, name, value, attrs):
+		context = super().get_context(name, value, attrs)
+		context.update({
+			'year_label': _('Year'),
+			'month_label': _('Month'),
+			'day_label': _('Day'),
+			'time_label': _('Time'),
+		})
+		return context
+
+	def decompress(self, value):
+		if value:
+			return [value.years, value.months, value.days,
+					time(hour=value.hours, minute=value.minutes,
+					second=value.seconds,
+					microsecond=value.microseconds)]
+		return [0, 0, 0, time()]
+
+
+class RelativeDetailFormField(forms.MultiValueField):
+	def __init__(self, **kwargs):
+		fields = [
+			forms.IntegerField(),
+			forms.IntegerField(),
+			forms.IntegerField(),
+			forms.TimeField(),
+		]
+		super().__init__(
+			fields=fields,
+			require_all_fields=False, **kwargs
+		)
+
+	def compress(self, data_list):
+		kwargs = {
+			'years': data_list[0],
+			'months': data_list[1],
+			'days': data_list[2],
+			'hours': data_list[3].hour,
+			'minutes': data_list[3].minute,
+		}
+		return relativedelta(**kwargs).normalized()
 
 
 class RelativeDeltaField(models.Field):

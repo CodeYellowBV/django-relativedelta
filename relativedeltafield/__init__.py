@@ -1,6 +1,7 @@
 import re
 
 from django.core.exceptions import ValidationError
+from django.contrib.admin.options import FORMFIELD_FOR_DBFIELD_DEFAULTS
 from django.db import models
 from django.forms.widgets import MultiWidget, TimeInput, NumberInput
 from django.utils.translation import ugettext_lazy as _
@@ -207,3 +208,10 @@ class RelativeDeltaField(models.Field):
 	def value_to_string(self, obj):
 		val = self.value_from_object(obj)
 		return '' if val is None else format_relativedelta(val)
+
+
+FORMFIELD_FOR_DBFIELD_DEFAULTS[RelativeDeltaField] = {
+	'form_class': RelativeDetailFormField,
+	'widget': RelativeDetailInput
+}
+

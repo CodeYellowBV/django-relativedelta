@@ -12,6 +12,7 @@ os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 setup(
 	name='django-relativedelta',
 	version='1.0.5',
+	package_dir={'relativedeltafield':'relativedeltafield'},
 	packages=find_packages(),
 	include_package_data=True,
 	license='MIT License',
@@ -20,7 +21,7 @@ setup(
 	url='https://github.com/CodeYellowBV/django-relativedelta',
 	author='Peter Bex',
 	author_email='peter@codeyellow.nl',
-	test_suite='relativedeltafield.tests',
+	test_suite='tests',
 	classifiers=[
 		'Environment :: Web Environment',
 		'Framework :: Django',

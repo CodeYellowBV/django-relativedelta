@@ -11,7 +11,7 @@ os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 
 setup(
 	name='django-relativedelta',
-	version='1.0.5',
+	version='1.0.6',
 	package_dir={'relativedeltafield':'relativedeltafield'},
 	packages=find_packages(),
 	include_package_data=True,

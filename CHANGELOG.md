@@ -1,17 +1,22 @@
 # Change log
 
+## v1.0.6
+
+* Loosen up check for Postgres backend by using a substring search, so
+  that the code won't break on custom Postgres adapters (#8).
+
 ## v1.0.5
 
 * Do not coerce "weeks" numbers to float.
-* Remove hard dependency on psycopg (#6)
+* Remove hard dependency on psycopg (#6).
 
 ## v1.0.4
 
-* Also recognise Postgis contrib engine as a supported Postgres engine
+* Also recognise Postgis contrib engine as a supported Postgres engine.
 
 ## v1.0.3
 
-* Accidental upload; is identical to v1.0.2
+* Accidental upload; is identical to v1.0.2.
 
 ## v1.0.2
 

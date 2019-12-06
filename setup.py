@@ -27,6 +27,9 @@ setup(
 		'Framework :: Django',
 		'Framework :: Django :: 1.10',
 		'Framework :: Django :: 1.11',
+		'Framework :: Django :: 2.0',
+		'Framework :: Django :: 2.1',
+		'Framework :: Django :: 2.2',
 		'Intended Audience :: Developers',
 		'License :: OSI Approved :: MIT License',
 		'Operating System :: OS Independent',
@@ -39,7 +42,7 @@ setup(
 		'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
 	],
 	install_requires=[
-		'Django >= 1.10',
+		'Django >= 1.10, < 3.0',
 		'python-dateutil >= 2.6.0',
                 # Disabled (for now?) due to https://github.com/CodeYellowBV/django-relativedelta/issues/6
                 # We never import it directly from the code, so that is okay

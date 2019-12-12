@@ -6,3 +6,5 @@ venv
 /.eggs/
 *.pyc
 .tox/
+.vscode/
+.python-version

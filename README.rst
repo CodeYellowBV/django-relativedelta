@@ -105,5 +105,3 @@ RelativeDeltaField, it automatically calls ``normalized()`` on
 ``full_clean``.  This ensures that the database representation is as
 similar to the relativedelta as possible (for instance, fractional
 days are always converted to hours).
-
-Currently, Django 3.0 is not supported.

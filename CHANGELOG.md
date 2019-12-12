@@ -1,5 +1,10 @@
 # Change log
 
+## v1.1.0
+
+* Add support for Django 3.0 (#9, #10)
+* Test on multiple Django/Python combinations
+
 ## v1.0.6
 
 * Loosen up check for Postgres backend by using a substring search, so

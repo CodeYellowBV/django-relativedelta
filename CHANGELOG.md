@@ -1,5 +1,9 @@
 # Change log
 
+## v1.1.1
+
+* Make check for Postgres more lenient by checking the vendor attribute (#11).
+
 ## v1.1.0
 
 * Add support for Django 3.0 (#9, #10)

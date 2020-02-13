@@ -89,7 +89,7 @@ class RelativeDeltaField(models.Field):
 
 
 	def db_type(self, connection):
-		if any(engine in connection.settings_dict['ENGINE'] for engine in ['postgresql', 'postgis']):
+		if connection.vendor == 'postgresql':
 			return 'interval'
 		else:
 			raise ValueError(_('RelativeDeltaField only supports PostgreSQL for storage'))

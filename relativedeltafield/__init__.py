@@ -66,6 +66,8 @@ def parse_relativedelta(value):
 
 # Format ISO8601 timespec
 def format_relativedelta(relativedelta):
+	if relativedelta is None:
+		return ''
 	result_big = ''
 	# TODO: We could always include all components, but that's kind of
 	# ugly, since one second would be formatted as 'P0Y0M0W0DT0M1S'
@@ -152,11 +154,10 @@ class RelativeDeltaField(models.Field):
 	descriptor_class = RelativeDeltaDescriptor
 
 	def db_type(self, connection):
-		if connection.vendor == 'postgresql3':
+		if connection.vendor == 'postgresql':
 			return 'interval'
 		else:
 			return 'varchar(27)'
-			### raise ValueError(_('RelativeDeltaField only supports PostgreSQL for storage'))
 
 
 	def to_python(self, value):
@@ -202,7 +203,7 @@ class RelativeDeltaField(models.Field):
 	# 		return fmt, params
 
 	def select_format(self, compiler, sql, params):
-		if compiler.connection.vendor == 'postgresql3':
+		if compiler.connection.vendor == 'postgresql':
 			fmt = 'to_char(%s, \'PYYYY"Y"MM"M"DD"DT"HH24"H"MI"M"SS.US"S"\')' % sql
 		else:
 			fmt = sql

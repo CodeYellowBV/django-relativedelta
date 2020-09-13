@@ -1,11 +1,11 @@
 import re
 
-import django
+from django import forms
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
-from datetime import timedelta
+from datetime import timedelta, date
 from dateutil.relativedelta import relativedelta
 
 # This is not quite ISO8601, as it allows the SQL/Postgres extension
@@ -25,9 +25,31 @@ iso8601_duration_re = re.compile(
     r'$'
 )
 
+class iso8601relativedelta(relativedelta):
+	def __init__(self, *args, **kwargs) -> None:
+		if len(args) == 1 and isinstance(args[0], iso8601relativedelta):
+			rd = args[0]
+			self.years = rd.years
+			self.months = rd.months
+			self.days = rd.days
+			self.hours = rd.hours
+			self.minutes = rd.minutes
+			self.seconds = rd.seconds
+			self.microseconds = rd.microseconds
+		else:
+			super().__init__(*args, **kwargs)
+
+	def __str__(self):
+		return format_relativedelta(self)
+
+
 # Parse ISO8601 timespec
-def parse_relativedelta(str):
-	m = iso8601_duration_re.match(str)
+def parse_relativedelta(value):
+	if isinstance(value, relativedelta):
+		return iso8601relativedelta(value)
+	if value is None or value == '':
+		return None
+	m = iso8601_duration_re.match(value)
 	if m:
 		args = {}
 		for k, v in m.groupdict().items():
@@ -37,7 +59,7 @@ def parse_relativedelta(str):
 				args[k] = float(v)
 			else:
 				args[k] = int(v)
-		return relativedelta(**args).normalized() if m else None
+		return iso8601relativedelta(**args).normalized() if m else None
 
 	raise ValueError('Not a valid (extended) ISO8601 interval specification')
 
@@ -75,6 +97,45 @@ def format_relativedelta(relativedelta):
 		return 'P{}'.format(result_big)
 
 
+class RelativeDeltaFormField(forms.CharField):
+
+	def prepare_value(self, value):
+		try:
+			return format_relativedelta(value)
+		except:
+			return value
+
+	def to_python(self, value):
+		return parse_relativedelta(value)
+
+	def clean(self, value):
+		try:
+			return parse_relativedelta(value)
+		except:
+			raise ValidationError('Not a valid (extended) ISO8601 interval specification', code='format')
+
+	def bound_data(self, data, initial):
+		return super().bound_data(data, initial)
+
+	def get_bound_field(self, form, field_name):
+		return super().get_bound_field(form, field_name)
+
+
+class RelativeDeltaDescriptor:
+	def __init__(self, field) -> None:
+		self.field = field
+
+	def __get__(self, obj, objtype=None):
+		if obj is None:
+			return None
+		value = obj.__dict__.get(self.field.name)
+		return parse_relativedelta(value)
+
+		#return RelativeDeltaProxy(iso=value)
+
+	def __set__(self, obj, value):
+		obj.__dict__[self.field.name] = None if value is None else format_relativedelta(parse_relativedelta(value))
+
 
 class RelativeDeltaField(models.Field):
 	"""Stores dateutil.relativedelta.relativedelta objects.
@@ -87,13 +148,15 @@ class RelativeDeltaField(models.Field):
 					 "ISO8601 interval format.")
 	}
 	description = _("RelativeDelta")
-
+	form_class = RelativeDeltaFormField
+	descriptor_class = RelativeDeltaDescriptor
 
 	def db_type(self, connection):
-		if connection.vendor == 'postgresql':
+		if connection.vendor == 'postgresql3':
 			return 'interval'
 		else:
-			raise ValueError(_('RelativeDeltaField only supports PostgreSQL for storage'))
+			return 'varchar(27)'
+			### raise ValueError(_('RelativeDeltaField only supports PostgreSQL for storage'))
 
 
 	def to_python(self, value):
@@ -102,7 +165,7 @@ class RelativeDeltaField(models.Field):
 		elif isinstance(value, relativedelta):
 			return value.normalized()
 		elif isinstance(value, timedelta):
-			return (relativedelta() + value).normalized()
+			return (iso8601relativedelta() + value).normalized()
 
 		try:
 			return parse_relativedelta(value)
@@ -134,18 +197,21 @@ class RelativeDeltaField(models.Field):
 	# We can't simply replace or remove PsycoPg2's parser, because
 	# that would mess with any existing Django DurationFields, since
 	# Django assumes PsycoPg2 returns pre-parsed datetime.timedeltas.
+	# 	def select_format(self, compiler, sql, params):
+	# 		fmt = 'to_char(%s, \'PYYYY"Y"MM"M"DD"DT"HH24"H"MI"M"SS.US"S"\')' % sql
+	# 		return fmt, params
+
 	def select_format(self, compiler, sql, params):
-		fmt = 'to_char(%s, \'PYYYY"Y"MM"M"DD"DT"HH24"H"MI"M"SS.US"S"\')' % sql
+		if compiler.connection.vendor == 'postgresql3':
+			fmt = 'to_char(%s, \'PYYYY"Y"MM"M"DD"DT"HH24"H"MI"M"SS.US"S"\')' % sql
+		else:
+			fmt = sql
 		return fmt, params
 
-	if django.VERSION < (2,):
-		def from_db_value(self, value, expression, connection, context=None):
-			if value is not None:
-				return parse_relativedelta(value)
-	else:
-		def from_db_value(self, value, expression, connection):
-			if value is not None:
-				return parse_relativedelta(value)
+	def from_db_value(self, value, expression, connection, context=None):
+		if value is not None:
+			return parse_relativedelta(value)
+
 
 	def value_to_string(self, obj):
 		val = self.value_from_object(obj)

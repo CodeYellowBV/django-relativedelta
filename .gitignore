@@ -8,3 +8,4 @@ venv
 .tox/
 .vscode/
 .python-version
+.idea

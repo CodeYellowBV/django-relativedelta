@@ -4,6 +4,10 @@
 
 * Make sure deprecation warning doesn't trigger in Django 3 (#12).
 
+## v1.1.2
+
+* Introduced pytest and tox for testing.
+
 ## v1.1.1
 
 * Make check for Postgres more lenient by checking the vendor attribute (#11).

@@ -138,14 +138,9 @@ class RelativeDeltaField(models.Field):
 		fmt = 'to_char(%s, \'PYYYY"Y"MM"M"DD"DT"HH24"H"MI"M"SS.US"S"\')' % sql
 		return fmt, params
 
-	if django.VERSION < (2,):
-		def from_db_value(self, value, expression, connection, context=None):
-			if value is not None:
-				return parse_relativedelta(value)
-	else:
-		def from_db_value(self, value, expression, connection):
-			if value is not None:
-				return parse_relativedelta(value)
+	def from_db_value(self, value, expression, connection, context=None):
+		if value is not None:
+			return parse_relativedelta(value)
 
 	def value_to_string(self, obj):
 		val = self.value_from_object(obj)

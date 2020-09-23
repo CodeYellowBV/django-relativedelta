@@ -1,7 +1,7 @@
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 
-from src.relativedeltafield import RelativeDeltaField
+from relativedeltafield import RelativeDeltaField
 from testapp.models import Interval
 
 from datetime import timedelta

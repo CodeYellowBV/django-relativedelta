@@ -78,11 +78,11 @@ WSGI_APPLICATION = 'testproject.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'relativedelta-testproject',
-        'HOST': os.environ.get('PG_HOST', '127.0.0.1'),
-        'PORT': os.environ.get('PG_PORT', 5432),
-        'USER': os.environ.get('PG_USER', 'postgres'),
-        'PASSWORD': os.environ.get('PG_PASSWORD', '')
+        'NAME': os.environ.get('PGDATABASE', 'relativedelta-testproject'),
+        'HOST': os.environ.get('PGHOSTADDR', os.environ.get('PGHOST', '127.0.0.1')),
+        'PORT': os.environ.get('PGPORT', 5432),
+        'USER': os.environ.get('PGUSER', 'postgres'),
+        'PASSWORD': os.environ.get('PGPASSWORD', '')
     },
 }
 

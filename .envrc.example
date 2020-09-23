@@ -1,0 +1,2 @@
+# we load the environment variables from .env see https://direnv.net/
+dotenv

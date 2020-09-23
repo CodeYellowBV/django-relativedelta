@@ -8,6 +8,8 @@ from django.utils.translation import ugettext_lazy as _
 from datetime import timedelta
 from dateutil.relativedelta import relativedelta
 
+__version__ = '1.1.2'
+
 # This is not quite ISO8601, as it allows the SQL/Postgres extension
 # of allowing a minus sign in the values, and you can mix weeks with
 # other units (which ISO doesn't allow).

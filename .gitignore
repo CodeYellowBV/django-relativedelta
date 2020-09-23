@@ -3,6 +3,8 @@
 !.*.example
 !.travis.yml
 !.editorconfig
+!tests/.coveragerc
+!.bumpversion.cfg
 
 ~build/
 

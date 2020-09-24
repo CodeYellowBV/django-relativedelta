@@ -8,6 +8,8 @@ from django.utils.translation import ugettext_lazy as _
 from datetime import timedelta
 from dateutil.relativedelta import relativedelta
 
+__version__ = '1.1.2'
+
 # This is not quite ISO8601, as it allows the SQL/Postgres extension
 # of allowing a minus sign in the values, and you can mix weeks with
 # other units (which ISO doesn't allow).
@@ -138,14 +140,9 @@ class RelativeDeltaField(models.Field):
 		fmt = 'to_char(%s, \'PYYYY"Y"MM"M"DD"DT"HH24"H"MI"M"SS.US"S"\')' % sql
 		return fmt, params
 
-	if django.VERSION < (2,):
-		def from_db_value(self, value, expression, connection, context=None):
-			if value is not None:
-				return parse_relativedelta(value)
-	else:
-		def from_db_value(self, value, expression, connection):
-			if value is not None:
-				return parse_relativedelta(value)
+	def from_db_value(self, value, expression, connection, context=None):
+		if value is not None:
+			return parse_relativedelta(value)
 
 	def value_to_string(self, obj):
 		val = self.value_from_object(obj)

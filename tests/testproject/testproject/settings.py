@@ -79,10 +79,10 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': os.environ.get('PGDATABASE', 'relativedelta-testproject'),
-        'HOST': os.environ.get('PGHOSTADDR', os.environ.get('PGHOST', '127.0.0.1')),
-        'PORT': os.environ.get('PGPORT', 5432),
-        'USER': os.environ.get('PGUSER', 'postgres'),
-        'PASSWORD': os.environ.get('PGPASSWORD', '')
+        'HOST': os.environ.get('PGHOSTADDR', os.environ.get('PGHOST')),
+        'PORT': os.environ.get('PGPORT'),
+        'USER': os.environ.get('PGUSER'),
+        'PASSWORD': os.environ.get('PGPASSWORD', os.environ.get('PGPASS'))
     },
 }
 

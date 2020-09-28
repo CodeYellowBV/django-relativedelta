@@ -2,6 +2,8 @@ import re
 
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.db.migrations.serializer import BaseSerializer
+from django.db.migrations.writer import MigrationWriter
 from django.utils.translation import ugettext_lazy as _
 
 from datetime import timedelta
@@ -146,3 +148,11 @@ class RelativeDeltaField(models.Field):
 	def value_to_string(self, obj):
 		val = self.value_from_object(obj)
 		return '' if val is None else format_relativedelta(val)
+
+
+class RelativeDeltaSerializer(BaseSerializer):
+	def serialize(self):
+		return repr(self.value), {'from dateutil.relativedelta import relativedelta'}
+
+
+MigrationWriter.register_serializer(relativedelta, RelativeDeltaSerializer)

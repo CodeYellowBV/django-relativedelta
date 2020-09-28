@@ -3,8 +3,7 @@ import re
 import relativedeltafield.forms
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.migrations.serializer import BaseSerializer
-from django.db.migrations.writer import MigrationWriter
+from django.utils.deconstruct import deconstructible
 from django.utils.translation import ugettext_lazy as _
 
 from datetime import timedelta
@@ -163,9 +162,4 @@ class RelativeDeltaField(models.Field):
 		return super().formfield(*args, **kwargs)
 
 
-class RelativeDeltaSerializer(BaseSerializer):
-	def serialize(self):
-		return repr(self.value), {'from dateutil.relativedelta import relativedelta'}
-
-
-MigrationWriter.register_serializer(relativedelta, RelativeDeltaSerializer)
+deconstructible(relativedelta)

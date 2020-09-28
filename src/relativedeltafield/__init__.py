@@ -1,5 +1,6 @@
 import re
 
+import relativedeltafield.forms
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.migrations.serializer import BaseSerializer
@@ -91,6 +92,14 @@ class RelativeDeltaField(models.Field):
 	}
 	description = _("RelativeDelta")
 
+	def __init__(self, *args, **kwargs):
+		if 'choices' in kwargs:
+			kwargs['choices'] = [
+				(self.to_python(value), label)
+				for value, label in
+				kwargs['choices']
+			]
+		super().__init__(*args, **kwargs)
 
 	def db_type(self, connection):
 		if connection.vendor == 'postgresql':
@@ -148,6 +157,10 @@ class RelativeDeltaField(models.Field):
 	def value_to_string(self, obj):
 		val = self.value_from_object(obj)
 		return '' if val is None else format_relativedelta(val)
+
+	def formfield(self, *args, **kwargs):
+		kwargs.setdefault('choices_form_class', relativedeltafield.forms.RelativeDeltaChoiceField)
+		return super().formfield(*args, **kwargs)
 
 
 class RelativeDeltaSerializer(BaseSerializer):

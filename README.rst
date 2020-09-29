@@ -33,10 +33,15 @@ model like so:
 .. code:: python
 
     from django.db import models
+    from dateutil.relativedelta import relativedelta
     from relativedeltafield import RelativeDeltaField
 
     class MyModel(models.Model):
-      rdfield=RelativeDeltaField()
+        rdfield = RelativeDeltaField()
+        rdchoices = RelativeDeltaField(choices=[
+            ('P1M', '1 month'),
+            (relativedelta(months=2), '2 month'),
+        ])
 
 Then later, you can use it:
 
@@ -78,6 +83,10 @@ app to always force ``full_clean()`` on ``save()``, so you can be
 sure that after a ``save()``, your fields are both normalized
 and validated.
 
+You can use `relativedeltafield.forms.RelativeDeltaChoiceField` to update
+`RelativeDeltaField` using a `Select` widget. If you provide `choices` argument
+to `RelativeDeltaField`, then `ModelForm` and `admin` will automatically use
+`RelativeDeltaChoiceField`.
 
 Limitations and pitfalls
 ------------------------

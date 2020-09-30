@@ -1,12 +1,26 @@
 import re
+from datetime import timedelta
 
-import django
+import relativedeltafield.forms
+from dateutil.relativedelta import relativedelta
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
-from datetime import timedelta
-from dateutil.relativedelta import relativedelta
+
+try:
+	from django.db.migrations.serializer import BaseSerializer
+	from django.db.migrations.writer import MigrationWriter
+	has_migration_serializer = True
+except ImportError:
+	has_migration_serializer = False
+
+try:
+	from django.utils.deconstruct import deconstructible
+	has_migration_deconstructible = True
+except ImportError:
+	has_migration_deconstructible = False
+
 
 __version__ = '1.1.2'
 
@@ -90,6 +104,14 @@ class RelativeDeltaField(models.Field):
 	}
 	description = _("RelativeDelta")
 
+	def __init__(self, *args, **kwargs):
+		if 'choices' in kwargs:
+			kwargs['choices'] = [
+				(self.to_python(value), label)
+				for value, label in
+				kwargs['choices']
+			]
+		super().__init__(*args, **kwargs)
 
 	def db_type(self, connection):
 		if connection.vendor == 'postgresql':
@@ -147,3 +169,20 @@ class RelativeDeltaField(models.Field):
 	def value_to_string(self, obj):
 		val = self.value_from_object(obj)
 		return '' if val is None else format_relativedelta(val)
+
+	def formfield(self, *args, **kwargs):
+		kwargs.setdefault('choices_form_class', relativedeltafield.forms.RelativeDeltaChoiceField)
+		return super().formfield(*args, **kwargs)
+
+
+if has_migration_serializer:
+	# Django 2.2 and up
+	class RelativeDeltaSerializer(BaseSerializer):
+		def serialize(self):
+			return repr(self.value), {'from dateutil.relativedelta import relativedelta'}
+
+	MigrationWriter.register_serializer(relativedelta, RelativeDeltaSerializer)
+
+elif has_migration_deconstructible:
+	# Django 2.1 and lower
+	deconstructible(relativedelta)

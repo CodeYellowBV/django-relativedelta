@@ -1,46 +1,15 @@
 sudo: false
 language: python
-matrix:
-  include:
-  - python: 3.6
-    env: DJANGO_VERSION=2.0.13
-  - python: 3.7
-    env: DJANGO_VERSION=2.0.13
-  - python: 3.8
-    env: DJANGO_VERSION=2.0.13
-
-  - python: 3.5
-    env: DJANGO_VERSION=2.1.10
-  - python: 3.6
-    env: DJANGO_VERSION=2.1.10
-  - python: 3.7
-    env: DJANGO_VERSION=2.1.10
-  - python: 3.8
-    env: DJANGO_VERSION=2.1.10
-
-  - python: 3.5
-    env: DJANGO_VERSION=2.2.3
-  - python: 3.6
-    env: DJANGO_VERSION=2.2.3
-  - python: 3.7
-    env: DJANGO_VERSION=2.2.3
-  - python: 3.8
-    env: DJANGO_VERSION=2.2.3
-
-  - python: 3.6
-    env: DJANGO_VERSION=3.0.0
-  - python: 3.7
-    env: DJANGO_VERSION=3.0.0
-  - python: 3.8
-    env: DJANGO_VERSION=3.0.0
+python:
+  - "3.6"
+  - "3.7"
+  - "3.8"
 
 ccache:
   pip: true
 install:
-  - "pip install --upgrade pip && pip install -q psycopg2 django==$DJANGO_VERSION python-dateutil"
+  - "pip install --upgrade pip && pip install -q tox-travis"
 script:
-  - ./setup.py test
-before_script:
-  - psql -c 'create database "relativedelta-test";' -U postgres
+  - tox
 services:
   - postgresql

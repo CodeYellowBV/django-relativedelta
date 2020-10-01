@@ -6,7 +6,7 @@ from setuptools import find_packages, setup
 test_deps = [
     'psycopg2-binary >= 2.8.0',
     'pytest >= 6.0.2',
-	'pytest-pythonpath>=0.7.3',
+    'pytest-pythonpath>=0.7.3',
     'pytest-echo>=1.7.1',
     'pytest-coverage',
     'pytest-django >= ^3.7.0',
@@ -15,11 +15,8 @@ test_deps = [
     'bump2version >= 1.0.0',
     'flake8 >= 3.8.3',
     'isort >= 5.5.3',
+    'mysqlclient >= 2.0.1'
 ]
-
-extras = {
-    'test': test_deps,
-}
 
 setup(
     name='django-relativedelta',
@@ -67,5 +64,7 @@ setup(
         'python-dateutil >= 2.6.0',
     ],
     tests_require=test_deps,
-    extras_require=extras
+    extras_require={
+        'test': test_deps,
+    }
 )

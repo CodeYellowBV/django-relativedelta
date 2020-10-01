@@ -106,7 +106,7 @@ else:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql_psycopg2',
-            'NAME': os.environ.get('PGDATABASE', 'relativedelta-testproject'),
+            'NAME': os.environ.get('PGDATABASE', 'relativedelta-test'),
             'HOST': os.environ.get('PGHOSTADDR', os.environ.get('PGHOST')),
             'PORT': os.environ.get('PGPORT'),
             'USER': os.environ.get('PGUSER'),
@@ -119,18 +119,6 @@ else:
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
 ]
 
 

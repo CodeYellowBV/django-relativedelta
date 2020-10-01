@@ -89,7 +89,7 @@ elif db == 'mysql':
             'NAME': 'relativedelta-test',
             'HOST': os.environ.get('MYSQL_HOST', '127.0.0.1'),
             'PORT': os.environ.get('MYSQL_PORT', 3306),
-            'USER': os.environ.get('MYSQL_USER', 'reldelta'),
+            'USER': os.environ.get('MYSQL_USER', 'root'),
             'PASSWORD': os.environ.get('MYSQL_PASSWORD', ''),
             'OPTIONS': {
                 'isolation_level': 'read uncommitted'

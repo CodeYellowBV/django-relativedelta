@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from testapp.models import Interval, IntervalWithChoices
+from testapp.models import Interval
 
 
 @admin.register(Interval)

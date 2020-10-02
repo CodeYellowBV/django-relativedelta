@@ -221,7 +221,6 @@ class RelativeDeltaFieldTest(TestCase):
         obj2 = Interval(value='P12D')
         obj2.save()
 
-        # This will fail for non postgres DB
         q = Interval.objects.filter(value__gt='P99D')
         self.assertEqual(1, q.count())
 

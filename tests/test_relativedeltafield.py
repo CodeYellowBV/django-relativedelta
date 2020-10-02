@@ -4,6 +4,8 @@ import django
 import pytest
 from dateutil.relativedelta import relativedelta
 from django.core.exceptions import ValidationError
+from django.db.models import CharField, Value, DurationField, F
+from django.db.models.functions import Cast
 from django.test import TestCase
 from testapp.models import Interval
 
@@ -232,3 +234,16 @@ class RelativeDeltaFieldTest(TestCase):
         obj1 = Interval(value='P1Y2M3W4DT5H6M7S')
         sum = datetime(2019, 1, 4, 10, 11, 12, 500) + obj1.value
         self.assertEqual(sum, datetime(2020, 3, 29, 15, 17, 19, 500))
+
+    # def test_simple_annotation(self):
+    #     one_month = Cast(
+    #         Value(relativedelta(months=1), output_field=RelativeDeltaField()),
+    #         DurationField()
+    #     )
+    #     q = Interval.objects.annotate(month_earlier=F('date') - one_month)
+    #     try:
+    #         str(q.query)
+    #     except AttributeError as e:
+    #         pytest.fail("Should not raise AttributeError")
+
+

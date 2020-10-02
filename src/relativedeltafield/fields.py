@@ -76,11 +76,15 @@ class RelativeDeltaField(models.Field):
         if value is None:
             return value
         else:
-            eng = settings.DATABASES[self.model._meta.default_manager.db]['ENGINE']
-            if 'postgres' in eng:
+            model = getattr(self, 'model', None)
+            if model:
+                eng = settings.DATABASES[model._meta.default_manager.db]['ENGINE']
+                if 'postgres' in eng:
+                    return format_relativedelta(self.to_python(value))
+                else:
+                    return relativedelta_as_csv(self.to_python(value))
+            else:  # We pray that this is postgres!
                 return format_relativedelta(self.to_python(value))
-            else:
-                return relativedelta_as_csv(self.to_python(value))
 
     # This is a bit of a mindfuck.  We have to cast the output field
     # as text to bypass the standard deserialisation of PsycoPg2 to

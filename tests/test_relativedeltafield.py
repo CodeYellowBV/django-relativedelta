@@ -1,10 +1,11 @@
-from datetime import datetime, timedelta
+import os
+from datetime import datetime, timedelta, date
 
 import django
 import pytest
 from dateutil.relativedelta import relativedelta
 from django.core.exceptions import ValidationError
-from django.db.models import CharField, Value, DurationField, F
+from django.db.models import Value, DurationField, F, ExpressionWrapper, DateField
 from django.db.models.functions import Cast
 from django.test import TestCase
 from testapp.models import Interval
@@ -235,15 +236,16 @@ class RelativeDeltaFieldTest(TestCase):
         sum = datetime(2019, 1, 4, 10, 11, 12, 500) + obj1.value
         self.assertEqual(sum, datetime(2020, 3, 29, 15, 17, 19, 500))
 
-    # def test_simple_annotation(self):
-    #     one_month = Cast(
-    #         Value(relativedelta(months=1), output_field=RelativeDeltaField()),
-    #         DurationField()
-    #     )
-    #     q = Interval.objects.annotate(month_earlier=F('date') - one_month)
-    #     try:
-    #         str(q.query)
-    #     except AttributeError as e:
-    #         pytest.fail("Should not raise AttributeError")
 
-
+@pytest.mark.xfail(os.environ.get('DBENGINE', 'pg') != 'pg', reason="Incompatible with non postgres DB")
+def test_simple_annotation(dummy_intervals):
+    one_month = Cast(
+        Value(relativedelta(months=1), output_field=RelativeDeltaField()),
+        DurationField()
+    )
+    q = Interval.objects.annotate(month_earlier=ExpressionWrapper(F('date') - one_month, output_field=DateField()))
+    result = list(q.values_list('date', 'month_earlier'))
+    assert result == [(date(2020, 3, 6), datetime(2020, 2, 6, 0, 0)),
+                      (date(2020, 10, 6), datetime(2020, 9, 6, 0, 0))]
+    assert 1 == q.filter(month_earlier__lt='2020-09-06').count()
+    assert 2 == q.filter(month_earlier__lte='2020-09-06').count()

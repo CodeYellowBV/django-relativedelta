@@ -12,6 +12,13 @@ maps to `Python's datetime.timedelta <https://docs.python.org/3/library/datetime
 has support for days and weeks, but not for years and months.  And if you try to read an ``INTERVAL`` that contains
 months anyway, information is lost because each month gets converted to 30 days.
 
+For compatibility, a `VARCHAR` field is used on other databases.  This
+uses a custom relativedelta representation.  However, this means that
+true in-database interval operations are not supported in these
+databases.  Sorting and comparing between two relativedelta fields or
+a relativedelta field and a fixed relativedelta value is supported,
+however.
+
 You should use this package when you need to store payment intervals
 (which tend to be monthly or quarterly), publication intervals (which
 can be weekly but also monthly) and so on, or when you simply don't
@@ -98,7 +105,7 @@ When serializing back to a string, weeks will never be written.
 Similarly, if the interval contains a multiple of 7 days, you can read
 this back out from the ``weeks`` property.
 
-Databases other than PostgreSQL are not supported.
+Support for databases other than PostgreSQL is limited.
 
 For consistency reasons, when a relativedelta object is assigned to a
 RelativeDeltaField, it automatically calls ``normalized()`` on

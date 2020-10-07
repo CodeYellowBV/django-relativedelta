@@ -1,11 +1,30 @@
-from datetime import timedelta
-
-from dateutil.relativedelta import relativedelta
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
-from relativedeltafield.utils import format_relativedelta, parse_relativedelta
+from relativedeltafield.utils import (format_relativedelta,
+                                      parse_relativedelta,
+                                      relativedelta_as_csv)
+
+
+class RelativeDeltaDescriptor:
+    def __init__(self, field) -> None:
+        self.field = field
+
+    def __get__(self, obj, objtype=None):
+        if obj is None:
+            return None
+        value = obj.__dict__.get(self.field.name)
+        if value is None:
+            return None
+        try:
+            return parse_relativedelta(value)
+        except ValueError as e:
+            raise ValidationError({self.field.name: e})
+
+    def __set__(self, obj, value):
+        obj.__dict__[self.field.name] = value
 
 
 class RelativeDeltaField(models.Field):
@@ -19,21 +38,31 @@ class RelativeDeltaField(models.Field):
                      "ISO8601 interval format.")
     }
     description = _("RelativeDelta")
+    descriptor_class = RelativeDeltaDescriptor
+
+    def get_lookup(self, lookup_name):
+        ret = super().get_lookup(lookup_name)
+        return ret
 
     def db_type(self, connection):
         if connection.vendor == 'postgresql':
             return 'interval'
         else:
-            raise ValueError(_('RelativeDeltaField only supports PostgreSQL for storage'))
+            return 'varchar(33)'
+
+    def get_db_prep_save(self, value, connection):
+        if value is None:
+            return None
+        if connection.vendor == 'postgresql':
+            return super().get_db_prep_save(value, connection)
+        else:
+            if isinstance(value, str):  # we need to convert it to the non-postgres format
+                return relativedelta_as_csv(parse_relativedelta(value))
+            return relativedelta_as_csv(value)
 
     def to_python(self, value):
         if value is None:
             return value
-        elif isinstance(value, relativedelta):
-            return value.normalized()
-        elif isinstance(value, timedelta):
-            return (relativedelta() + value).normalized()
-
         try:
             return parse_relativedelta(value)
         except (ValueError, TypeError):
@@ -47,7 +76,10 @@ class RelativeDeltaField(models.Field):
         if value is None:
             return value
         else:
-            return format_relativedelta(self.to_python(value))
+            if connection.vendor == 'postgresql':
+                return format_relativedelta(self.to_python(value))
+            else:
+                return relativedelta_as_csv(self.to_python(value))
 
     # This is a bit of a mindfuck.  We have to cast the output field
     # as text to bypass the standard deserialisation of PsycoPg2 to
@@ -63,7 +95,10 @@ class RelativeDeltaField(models.Field):
     # that would mess with any existing Django DurationFields, since
     # Django assumes PsycoPg2 returns pre-parsed datetime.timedeltas.
     def select_format(self, compiler, sql, params):
-        fmt = 'to_char(%s, \'PYYYY"Y"MM"M"DD"DT"HH24"H"MI"M"SS.US"S"\')' % sql
+        if compiler.connection.vendor == 'postgresql':
+            fmt = 'to_char(%s, \'PYYYY"Y"MM"M"DD"DT"HH24"H"MI"M"SS.US"S"\')' % sql
+        else:
+            fmt = sql
         return fmt, params
 
     def from_db_value(self, value, expression, connection, context=None):

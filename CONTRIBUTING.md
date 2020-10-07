@@ -4,7 +4,8 @@
 
 1. Clone the project
 2. Create a virtualenv
-3. pip install -e .[test]
+3. Make sure you have latest version of pip: `pip install -U pip`
+4. pip install -e ".[test]"
 
 ## Launch tests
 

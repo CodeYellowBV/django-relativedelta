@@ -31,13 +31,13 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-	'testapp',
+    'django.contrib.admin',
+    'testapp',
 	'testproject',
 ]
 
@@ -74,35 +74,51 @@ WSGI_APPLICATION = 'testproject.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
+db = os.environ.get('DBENGINE', 'pg')
+if db == 'sqlite':
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': 'relativedelta-test',
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': os.environ.get('PGDATABASE', 'relativedelta-testproject'),
-        'HOST': os.environ.get('PGHOSTADDR', os.environ.get('PGHOST')),
-        'PORT': os.environ.get('PGPORT'),
-        'USER': os.environ.get('PGUSER'),
-        'PASSWORD': os.environ.get('PGPASSWORD', os.environ.get('PGPASS'))
-    },
-}
+        }}
+elif db == 'mysql':
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': 'relativedelta-test',
+            'HOST': os.environ.get('MYSQL_HOST', '127.0.0.1'),
+            'PORT': os.environ.get('MYSQL_PORT', 3306),
+            'USER': os.environ.get('MYSQL_USER', 'root'),
+            'PASSWORD': os.environ.get('MYSQL_PASSWORD', ''),
+            'OPTIONS': {
+                'isolation_level': 'read uncommitted'
+            },
+            'TEST': {
+                # 'NAME': 'relativedelta-test',
+                'OPTIONS': {
+                    'isolation_level': 'read uncommitted'
+                },
+            },
+            'CHARSET': 'utf8',
+            'COLLATION': 'utf8_general_ci'}}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': os.environ.get('PGDATABASE', 'relativedelta-test'),
+            'HOST': os.environ.get('PGHOSTADDR', os.environ.get('PGHOST')),
+            'PORT': os.environ.get('PGPORT'),
+            'USER': os.environ.get('PGUSER'),
+            'PASSWORD': os.environ.get('PGPASSWORD', os.environ.get('PGPASS'))
+        },
+    }
 
 
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
 ]
 
 

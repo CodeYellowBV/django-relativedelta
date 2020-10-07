@@ -1,11 +1,8 @@
 # Change log
 
-## unreleased
-
-* Make sure deprecation warning doesn't trigger in Django 3 (#12).
-
 ## v1.1.3
 
+* Make sure deprecation warning doesn't trigger in Django 3 (#12).
 * Introduced compatibility with non postgres databases. 
 
 

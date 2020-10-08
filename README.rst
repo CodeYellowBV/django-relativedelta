@@ -5,7 +5,7 @@ django-relativedelta
    :target: https://travis-ci.org/CodeYellowBV/django-relativedelta
 
 A Django field for the `dateutil.relativedelta.relativedelta <http://dateutil.readthedocs.io/en/stable/relativedelta.html>`_ class,
-which conveniently maps to the `PostgresQL INTERVAL type <https://www.postgresql.org/docs/current/static/datatype-datetime.html#DATATYPE-INTERVAL-INPUT>`_.
+which conveniently maps to the `PostgreSQL INTERVAL type <https://www.postgresql.org/docs/current/static/datatype-datetime.html#DATATYPE-INTERVAL-INPUT>`_.
 
 The standard `Django DurationField <https://docs.djangoproject.com/en/1.10/ref/models/fields/#durationfield>`_
 maps to `Python's datetime.timedelta <https://docs.python.org/3/library/datetime.html#datetime.timedelta>`_, which

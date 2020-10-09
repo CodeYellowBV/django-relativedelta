@@ -30,8 +30,8 @@ setup(
     url='https://github.com/CodeYellowBV/django-relativedelta',
     keywords='django, ',
     setup_requires=[],
-    author='Peter Bex',
-    author_email='peter@codeyellow.nl',
+    author='Code Yellow B.V.',
+    author_email='django-relativedelta@codeyellow.nl',
     test_suite='tests',
     classifiers=[
         'Development Status :: 5 - Production/Stable',

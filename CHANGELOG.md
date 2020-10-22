@@ -3,8 +3,8 @@
 ## v1.1.2
 
 * Make sure deprecation warning doesn't trigger in Django 3 (#12).
-* Introduced compatibility with non postgres databases. 
-* Introduced pytest and tox for testing.
+* Introduced compatibility with non postgres databases (#16).
+* Introduced pytest and tox for testing (#13).
 
 ## v1.1.1
 

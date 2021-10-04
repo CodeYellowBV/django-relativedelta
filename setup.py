@@ -9,7 +9,7 @@ test_deps = [
     'pytest-pythonpath>=0.7.3',
     'pytest-echo>=1.7.1',
     'pytest-coverage',
-    'pytest-django >= ^3.7.0',
+    'pytest-django >= 3.7.0',
     'tox >= 3.14.3',
     'tox-pyenv >= 1.1.0',
     'bump2version >= 1.0.0',

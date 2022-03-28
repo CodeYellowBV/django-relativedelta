@@ -1,0 +1,17 @@
+version: '3'
+
+services:
+  mysql:
+    image: mysql:8.0
+  psql:
+    image: postgres:11.5
+  backend:
+    environment:
+        MYSQL_ROOT_PASSWORD: test
+    depends_on:
+        - psql
+        - mysql
+    build: docker/
+    command: tail -f /dev/null
+    volumes:
+      - .:/django-relativedelta

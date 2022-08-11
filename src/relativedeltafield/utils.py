@@ -33,17 +33,26 @@ iso8601_csv_re: re.Pattern = re.compile(
 
 # Parse ISO8601 timespec
 def parse_relativedelta(
-    value: typing.Optional[relativedelta]
-) -> typing.Optional[relativedelta] | typing.NoReturn:
+    value: typing.Optional[typing.Union[relativedelta, timedelta, str]]
+) -> typing.Union[relativedelta, typing.NoReturn]:
+    """Parses a relative delta, time delta or string into ISO08601
+
+    Raises:
+
+        ValueError: IS the value is not an ISO08601 spec
+    """
     if value is None or value == '':
         return None
-    elif isinstance(value, timedelta):
+
+    if isinstance(value, timedelta):
         microseconds = value.seconds % 1 * 1e6 + value.microseconds
-        seconds: typing.Optional[int] = int(value.seconds)
+        seconds = int(value.seconds)
         return relativedelta(days=value.days, seconds=seconds, microseconds=microseconds)
-    elif isinstance(value, relativedelta):
+
+    if isinstance(value, relativedelta):
         return value.normalized()
-    elif isinstance(value, str):
+
+    if isinstance(value, str):
         try:
             m = iso8601_duration_re.match(value) or iso8601_csv_re.match(value)
             if m:
@@ -56,12 +65,13 @@ def parse_relativedelta(
                     else:
                         args[k] = int(v)
                 return relativedelta(**args).normalized() if m else None
-        except Exception:
+        except Exception:  # pylint: disable=broad-except
             pass
     raise ValueError('Not a valid (extended) ISO8601 interval specification')
 
 
 def relativedelta_as_csv(self) -> str:
+    """TODO: Docstring"""
     return '%05d/%03d/%03d %03d:%03d:%03d.%07d' % (
         self.years,
         self.months,
@@ -73,34 +83,39 @@ def relativedelta_as_csv(self) -> str:
     )
 
 
-# Format ISO8601 timespec
-def format_relativedelta(relativedelta: relativedelta) -> str:
+def format_relativedelta(relativedelta_: relativedelta) -> str:
+    """Format ISO8601 timespec"""
     result_big: str = ''
     # TODO: We could always include all components, but that's kind of
     # ugly, since one second would be formatted as 'P0Y0M0W0DT0M1S'
-    if relativedelta.years:
-        result_big += '{}Y'.format(relativedelta.years)
-    if relativedelta.months:
-        result_big += '{}M'.format(relativedelta.months)
-    if relativedelta.days:
-        result_big += '{}D'.format(relativedelta.days)
+    if relativedelta_.years:
+        result_big += f'{relativedelta_.years}Y'
+
+    if relativedelta_.months:
+        result_big += f'{relativedelta_.months}M'
+
+    if relativedelta_.days:
+        result_big += f'{relativedelta_.days}D'
 
     result_small: str = ''
-    if relativedelta.hours:
-        result_small += '{}H'.format(relativedelta.hours)
-    if relativedelta.minutes:
-        result_small += '{}M'.format(relativedelta.minutes)
+    if relativedelta_.hours:
+        result_small += f'{relativedelta_.hours}H'
+
+    if relativedelta_.minutes:
+        result_small += f'{relativedelta_.minutes}M'
+
     # Microseconds is allowed here as a convenience, the user may have
     # used normalized(), which can result in microseconds
-    if relativedelta.seconds:
-        seconds: float = relativedelta.seconds
-        if relativedelta.microseconds:
-            seconds += relativedelta.microseconds / 1000000.0
-        result_small += '{}S'.format(seconds)
+    if relativedelta_.seconds:
+        seconds: float = relativedelta_.seconds
+        if relativedelta_.microseconds:
+            seconds += relativedelta_.microseconds / 1000000.0
+        result_small += f'{seconds}S'
 
     if len(result_small) > 0:
-        return 'P{}T{}'.format(result_big, result_small)
-    elif len(result_big) == 0:
+        return f'P{result_big}T{result_small}'
+
+    if len(result_big) == 0:
         return 'P0D'  # Doesn't matter much what field is zero, but just 'P' is invalid syntax, and so is ''
-    else:
-        return 'P{}'.format(result_big)
+
+    return f'P{result_big}'

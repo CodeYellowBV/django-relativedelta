@@ -55,7 +55,7 @@ setup(
         'Topic :: Software Development :: Libraries :: Python Modules',
     ],
     install_requires=[
-        'Django >= 3.2',
+        'Django >= 1.10',
         'python-dateutil >= 2.6.0',
     ],
     tests_require=test_deps,

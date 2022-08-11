@@ -1,4 +1,4 @@
-name: Relativedleta tests
+name: Relativedelta tests
 
 on: [push]
 

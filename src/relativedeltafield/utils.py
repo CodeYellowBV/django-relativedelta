@@ -1,4 +1,5 @@
 import re
+import typing
 from datetime import timedelta
 
 from dateutil.relativedelta import relativedelta
@@ -6,7 +7,7 @@ from dateutil.relativedelta import relativedelta
 # This is not quite ISO8601, as it allows the SQL/Postgres extension
 # of allowing a minus sign in the values, and you can mix weeks with
 # other units (which ISO doesn't allow).
-iso8601_duration_re = re.compile(
+iso8601_duration_re: re.Pattern = re.compile(
     r'P'
     r'(?:(?P<years>-?\d+(?:\.\d+)?)Y)?'
     r'(?:(?P<months>-?\d+(?:\.\d+)?)M)?'
@@ -21,18 +22,22 @@ iso8601_duration_re = re.compile(
 )
 
 # This is the comma-separated internal value to be used for databases non supporting the interval type natively
-iso8601_csv_re = re.compile(r"^(?P<years>^[-\d]\d{4})/(?P<months>[-\d]\d{2})/(?P<days>[-\d]\d{2}) "
-                            r"(?P<hours>[-\d]\d{2}):(?P<minutes>[-\d]\d{2}):(?P<seconds>[-\d]\d{2})\."
-                            r"(?P<microseconds>[-\d]\d{6})$")
+iso8601_csv_re: re.Pattern = re.compile(
+    r"^(?P<years>^[-\d]\d{4})/(?P<months>[-\d]\d{2})/(?P<days>[-\d]\d{2}) "
+    r"(?P<hours>[-\d]\d{2}):(?P<minutes>[-\d]\d{2}):(?P<seconds>[-\d]\d{2})\."
+    r"(?P<microseconds>[-\d]\d{6})$"
+)
 
 
 # Parse ISO8601 timespec
-def parse_relativedelta(value):
+def parse_relativedelta(
+    value: typing.Optional[relativedelta]
+) -> typing.Optional[relativedelta] | typing.NoReturn:
     if value is None or value == '':
         return None
     elif isinstance(value, timedelta):
         microseconds = value.seconds % 1 * 1e6 + value.microseconds
-        seconds = int(value.seconds)
+        seconds: typing.Optional[int] = int(value.seconds)
         return relativedelta(days=value.days, seconds=seconds, microseconds=microseconds)
     elif isinstance(value, relativedelta):
         return value.normalized()
@@ -67,8 +72,8 @@ def relativedelta_as_csv(self) -> str:
 
 
 # Format ISO8601 timespec
-def format_relativedelta(relativedelta):
-    result_big = ''
+def format_relativedelta(relativedelta: relativedelta) -> str:
+    result_big: str = ''
     # TODO: We could always include all components, but that's kind of
     # ugly, since one second would be formatted as 'P0Y0M0W0DT0M1S'
     if relativedelta.years:
@@ -78,7 +83,7 @@ def format_relativedelta(relativedelta):
     if relativedelta.days:
         result_big += '{}D'.format(relativedelta.days)
 
-    result_small = ''
+    result_small: str = ''
     if relativedelta.hours:
         result_small += '{}H'.format(relativedelta.hours)
     if relativedelta.minutes:
@@ -86,7 +91,7 @@ def format_relativedelta(relativedelta):
     # Microseconds is allowed here as a convenience, the user may have
     # used normalized(), which can result in microseconds
     if relativedelta.seconds:
-        seconds = relativedelta.seconds
+        seconds: float = relativedelta.seconds
         if relativedelta.microseconds:
             seconds += relativedelta.microseconds / 1000000.0
         result_small += '{}S'.format(seconds)

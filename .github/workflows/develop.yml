@@ -16,10 +16,10 @@ jobs:
       postgres:
         image: postgres:11.6
         env:
-          DB_USER: postgres
-          DB_PASS: postgres
-          DB_NAME: postgres
-          DB_HOST: localhost
+          PGUSER: postgres
+          PGPASSWORD: postgres
+          PGDATABASE: relativedeltafield
+          PGHOST: localhost
         ports:
         - 5432:5432
     strategy:
@@ -51,8 +51,8 @@ jobs:
       run: |
         tox
       env:
-          DB_USER: postgres
-          DB_USER: postgres
-          DB_NAME: postgres
-          DB_HOST: localhost
+          PGUSER: postgres
+          PGPASSWORD: postgres
+          PGDATABASE: relativedeltafield
+          PGHOST: localhost
 

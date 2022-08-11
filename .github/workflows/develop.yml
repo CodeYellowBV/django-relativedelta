@@ -1,0 +1,66 @@
+name: Relativedleta tests
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          DB_USER: root
+          DB_PASSWORD: root
+          DB_HOST: localhost
+          DB_PORT: 3306
+          DB_DATABASE: relativedeltafield
+          MYSQL_ROOT_PASSWORD: root
+        ports:
+        - 3306
+      postgres:
+        image: postgres:11.6
+        env:
+          PGUSER: postgres
+          PGPASSWORD: postgres
+          PGDATABASE: relativedeltafield
+          PGHOST: localhost
+        ports:
+        - 5432:5432
+    strategy:
+      matrix:
+        python-version: ["3.9", "3.10"]
+    steps:
+    - name: Start Postgres
+      run: |
+        sudo /etc/init.d/postgresql start || journalctl -xe
+    - name: Start MySQL
+      run: |
+        sudo /etc/init.d/mysql start || journalctl -xe
+    - uses: actions/checkout@v3
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install tox tox-gh-actions
+    - name: Lint with 'flake8'
+      run: |
+        pip install flake8
+        # stop the build if there are Python syntax errors or undefined names
+        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
+        flake8 src --count --show-source --statistics --exit-zero --max-complexity=20
+    - name: Test with pytest
+      run: |
+        tox
+      env:
+          PGUSER: postgres
+          PGPASSWORD: postgres
+          PGDATABASE: relativedeltafield
+          PGHOST: localhost
+          MYSQL_USER: root
+          MYSQL_PASSWORD: root
+          MYSQL_HOST: localhost
+          MYSQL_PORT: 3306

@@ -1,10 +1,13 @@
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.utils.translation import gettext_lazy as _
-
 from relativedeltafield.utils import (format_relativedelta,
                                       parse_relativedelta,
                                       relativedelta_as_csv)
+
+try:
+    from django.utils.translation import gettext_lazy as _
+except ImportError:
+    from django.utils.translation import ugettext as _
 
 
 class RelativeDeltaDescriptor:

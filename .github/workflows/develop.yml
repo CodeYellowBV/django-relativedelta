@@ -28,7 +28,7 @@ jobs:
     steps:
     - name: Start Postgres
       run: |
-        sudo /etc/init.d/postgres start
+        sudo /etc/init.d/postgresql start
     - name: Start MySQL
       run: |
         sudo /etc/init.d/mysql start

@@ -31,7 +31,7 @@ jobs:
         sudo /etc/init.d/postgresql start || journalctl -xe
     - name: Start MySQL
       run: |
-        sudo /etc/init.d/mysql start
+        sudo /etc/init.d/mysql start || journalctl -xe
     - uses: actions/checkout@v3
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v4
@@ -48,5 +48,10 @@ jobs:
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
         flake8 src --count --show-source --statistics --exit-zero --max-complexity=20
     - name: Test with pytest
+      env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+          MYSQL_ROOT_PASSWORD: insecure_password
       run: |
         tox

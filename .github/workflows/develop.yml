@@ -3,55 +3,65 @@ name: Relativedleta tests
 on: [push]
 
 jobs:
-  build:
-
+  container-job:
+    build:
+      runs-on: ubuntu-latest
+      services:
+        mysql:
+          image: mysql:5.7
+          env:
+            MYSQL_ROOT_PASSWORD: insecure_password
+          ports:
+          - 3306
+        postgres:
+          image: postgres:10.8
+          env:
+            POSTGRES_USER: postgres
+            POSTGRES_PASSWORD: postgres
+            POSTGRES_DB: postgres
+          ports:
+          - 5432:5432
+      strategy:
+        max-parallel: 4
+        matrix:
+          python-version: ["3.9", "3.10"]
+      steps:
+      - name: Start Postgres
+        run: |
+          sudo /etc/init.d/postgresql start || journalctl -xe
+      - name: Start MySQL
+        run: |
+          sudo /etc/init.d/mysql start || journalctl -xe
+  vm-job:
     runs-on: ubuntu-latest
-    services:
-      mysql:
-        image: mysql:5.7
-        env:
-          MYSQL_ROOT_PASSWORD: insecure_password
-        ports:
-        - 3306
-      postgres:
+      services:
         image: postgres:10.8
         env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: postgres
+            POSTGRES_USER: postgres
+            POSTGRES_PASSWORD: postgres
+            POSTGRES_DB: postgres
+            MYSQL_ROOT_PASSWORD: insecure_password
+            POSTGRES_USER: postgres
+            POSTGRES_PASSWORD: postgres
+            POSTGRES_DB: postgres
         ports:
-        - 5432:5432
-    strategy:
-      max-parallel: 4
-      matrix:
-        python-version: ["3.9", "3.10"]
-    steps:
-    - name: Start Postgres
-      run: |
-        sudo /etc/init.d/postgresql start || journalctl -xe
-    - name: Start MySQL
-      run: |
-        sudo /etc/init.d/mysql start || journalctl -xe
-    - uses: actions/checkout@v3
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install tox tox-gh-actions
-    - name: Lint with flake8
-      run: |
-        pip install flake8
-        # stop the build if there are Python syntax errors or undefined names
-        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-        flake8 src --count --show-source --statistics --exit-zero --max-complexity=20
-    - name: Test with pytest
-      env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: postgres
-          MYSQL_ROOT_PASSWORD: insecure_password
-      run: |
-        tox
+        - 5432/tcp
+      steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install tox tox-gh-actions
+      - name: Lint with flake8
+        run: |
+          pip install flake8
+          # stop the build if there are Python syntax errors or undefined names
+          # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
+          flake8 src --count --show-source --statistics --exit-zero --max-complexity=20
+      - name: Test with pytest
+        run: |
+          tox

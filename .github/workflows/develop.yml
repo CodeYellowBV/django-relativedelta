@@ -12,12 +12,15 @@ jobs:
         env:
           MYSQL_ROOT_PASSWORD: insecure_password
         ports:
-        -  3306
+        - 3306
     strategy:
       max-parallel: 4
       matrix:
         python-version: ["3.9", "3.10"]
     steps:
+    - name: Start MySQL
+      run: |
+        sudo /etc/init.d/mysql start
     - uses: actions/checkout@v3
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v4

@@ -1,3 +1,5 @@
+""" .. currentmodule:: relativedelta.utils"""
+
 import re
 import typing
 from datetime import timedelta

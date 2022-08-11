@@ -1,7 +1,8 @@
+""" .. currentmodule:: relativedelta.forms"""
+
 from django import forms
 from django.core.exceptions import ValidationError
-
-from relativedeltafield.utils import parse_relativedelta, format_relativedelta
+from relativedeltafield.utils import format_relativedelta, parse_relativedelta
 
 
 class RelativeDeltaFormField(forms.CharField):

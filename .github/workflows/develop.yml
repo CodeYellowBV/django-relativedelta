@@ -16,9 +16,10 @@ jobs:
       postgres:
         image: postgres:11.6
         env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: postgres
+          DB_USER: postgres
+          DB_PASS: postgres
+          DB_NAME: postgres
+          DB_HOST: localhost
         ports:
         - 5432:5432
     strategy:
@@ -50,7 +51,8 @@ jobs:
       run: |
         tox
       env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: postgres
+          DB_USER: postgres
+          DB_USER: postgres
+          DB_NAME: postgres
+          DB_HOST: localhost
 

@@ -59,8 +59,7 @@ jobs:
           PGPASSWORD: postgres
           PGDATABASE: relativedeltafield
           PGHOST: localhost
-          DB_USER: root
-          DB_PASSWORD: insecure_password
-          DB_HOST: localhost
-          DB_PORT: 3306
-          DB_DATABASE: relativedeltafield
+          MYSQL_USER: root
+          MYSQL_PASSWORD: insecure_password
+          MYSQL_HOST: localhost
+          MYSQL_PORT: 3306

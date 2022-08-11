@@ -1,4 +1,4 @@
-.*
+#.*
 !.gitignore
 !.*.example
 !.travis.yml
@@ -7,7 +7,7 @@
 !.bumpversion.cfg
 
 ~build/
-
+.coverage
 *.egg-info
 
 *.sqlite

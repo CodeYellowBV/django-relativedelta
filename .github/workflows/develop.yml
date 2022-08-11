@@ -10,7 +10,10 @@ jobs:
       mysql:
         image: mysql:5.7
         env:
-          MYSQL_ROOT_PASSWORD: insecure_password
+          MYSQL_PASSWORD: insecure_password
+          MYSQL_HOST: localhost
+          MYSQL_PORT: 3306
+          MYSQL_USER: root
         ports:
         - 3306
       postgres:
@@ -55,4 +58,8 @@ jobs:
           PGPASSWORD: postgres
           PGDATABASE: relativedeltafield
           PGHOST: localhost
+          MYSQL_PASSWORD: insecure_password
+          MYSQL_HOST: localhost
+          MYSQL_PORT: 3306
+          MYSQL_USER: root
 

@@ -7,7 +7,7 @@
 !.bumpversion.cfg
 
 ~build/
-
+.coverage
 *.egg-info
 
 *.sqlite

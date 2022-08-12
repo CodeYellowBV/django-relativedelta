@@ -6,7 +6,7 @@
 !tests/.coveragerc
 !.bumpversion.cfg
 
-~build/
+build/
 
 *.egg-info
 

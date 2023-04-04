@@ -5,7 +5,7 @@ import os
 from setuptools import find_packages, setup
 
 test_deps = [
-    'psycopg2-binary <= 2.8.0',
+    'psycopg2-binary <= 2.8.6',
     'pytest >= 6.0.2',
     'pytest-pythonpath>=0.7.3',
     'pytest-echo>=1.7.1',
@@ -21,7 +21,7 @@ test_deps = [
 
 setup(
     name='django-relativedelta',
-    version='1.1.2',
+    version='2.0.0',
     package_dir={'': 'src'},
     packages=find_packages('src'),
     include_package_data=True,

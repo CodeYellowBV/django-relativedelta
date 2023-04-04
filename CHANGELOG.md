@@ -1,5 +1,10 @@
 # Change log
 
+## v2.0.0
+
+* Include support for Django versions 3 fully and 4 until (not including) Django 4.2
+* Add Github workflow testing support to the codebase
+
 ## v1.1.2
 
 * Make sure deprecation warning doesn't trigger in Django 3 (#12).
